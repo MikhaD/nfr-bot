@@ -1,0 +1,28 @@
+{
+	"help": {
+		"parameters": {
+			"optional": ["command"]
+		},
+		"description": "Show the help menu, or help info for a command.",
+		"example": "help absences"
+	},
+	"flip": {
+		"description": "flip a 50/50 coin.",
+		"example": "flip"
+	},
+	"purge": {
+		"parameters": {
+			"required": ["messages"],
+			"optional": ["hide success msg"]
+		},
+		"description": "Delete <messages> number of messages.",
+		"example": "purge 15 true"
+	},
+	"absences": {
+		"parameters": {
+			"optional": ["guild, min days"]
+		},
+		"description": "list players from a guild who have been absent for <min days> number of days, Nefarious Ravens and 7 days by default.",
+		"example": "absences The Simple Ones 15"
+	}
+}

@@ -1,0 +1,13 @@
+{
+	"prefix": "!",
+	"default_guild": "Nefarious Ravens",
+	"min_days": 7,
+	"embed": {
+		"colors": {
+			"default": "#980F91",
+			"error": "#ff2d00",
+			"warn": "#FE9713",
+			"success": "#24a400"
+		}
+	}
+}
