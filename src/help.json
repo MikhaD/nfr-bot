@@ -20,9 +20,9 @@
 	},
 	"absences": {
 		"parameters": {
-			"optional": ["guild, min days"]
+			"optional": ["guild", "min days"]
 		},
 		"description": "list players from a guild who have been absent for <min days> number of days, Nefarious Ravens and 7 days by default.",
-		"example": "absences The Simple Ones 15"
+		"example": "absences Nefarious Ravens 15"
 	}
 }

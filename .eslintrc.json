@@ -14,6 +14,7 @@
 		"linebreak-style": ["warn", "windows"],
 		"quotes": ["warn", "double"],
 		"semi": ["error", "always"],
+		"no-unreachable": ["warn"],
 		// warn if no defualt case in switch statements
 		"default-case": ["warn"],
 		// warn if default case is not last in switch statement

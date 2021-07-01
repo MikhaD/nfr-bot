@@ -2,6 +2,7 @@
 	"prefix": "!",
 	"default_guild": "Nefarious Ravens",
 	"min_days": 7,
+	"defualt_dice": 6,
 	"embed": {
 		"colors": {
 			"default": "#980F91",
