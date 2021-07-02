@@ -1,7 +1,8 @@
 module.exports = {
 	name: "flip",
+	aliases: ["coin"],
 	args: {},
-	description: "flip a 50/50 coin.",
+	description: "Flip a 50/50 coin.",
 	example: "flip",
 
 	/*eslint no-unused-vars: "off"*/

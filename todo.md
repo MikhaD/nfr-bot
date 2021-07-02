@@ -1,11 +1,11 @@
 # TO DO
 - instead of a parameter to get rid of times to make copying easier have reactions below message
-- sort names based on time absent
 - multiple pages if there are more than 25 people absent
-- second page saying which if any were unable to have their data received (different color on the side and red x in front of their name)
+- Failed page with names of players who's data failed to get retrieved on reacting to ❗ if there are failed players
 - Prevent names like _Wahoo_ from being interpreted as italic
 - store guild object with player data in database & fetch it if query is made again within the hour
 - additional info property that gets displayed when help is called on a specific command
+- replace objects in places like absences with maps
 
 
 

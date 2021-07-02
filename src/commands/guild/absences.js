@@ -8,12 +8,11 @@ module.exports = {
 	args: {
 		optional: ["guild", "min days"]
 	},
-	description: "list players from a guild who have been absent for <min days> number of days, Nefarious Ravens and 7 days by default.",
+	description: "List players from a guild who have been absent for <min days> number of days, Nefarious Ravens and 7 days by default.",
 	example: "absences Nefarious Ravens 15",
 	cooldown: 10,
 
 	async execute(msg, args) {
-		msg.channel.startTyping();
 		//i ######################################## Process arguments #######################################
 		let guild = config.default_guild;
 		if (args.length > 0) {
@@ -44,16 +43,23 @@ module.exports = {
 		//i ########################################## Create embed ##########################################
 		let absencesEmbed = new MessageEmbed()
 			.setColor(config.embed.colors.default)
-			.setTitle(`${args[0]} Absences:`)
-			.setDescription(`The following ${Object.keys(data.absences).length} people have been absent for ${args[1]}+ days`)
-			//! if there are failed players, add an ❗ reaction at the end and a line in footer saying ❗Failed players. Failed players should have clock reaction to return
-			.setFooter(`◀️Previous, ▶️Next, 📄Hide days\n\npage 1 of ${1}`); //! change this to reflect the actual values
+			.setTitle(`${args[0]} Absences:`);
 
-		for (let member of Object.keys(data.absences)) {
-			if (data.absences[member] >= args[1]) {
-				absencesEmbed.addField(member, `${data.absences[member]} days`);
+		let absentees = 0;
+		//i Sort absences by time absent
+		data.absences = new Map([...data.absences.entries()].sort((a, b) => b[1] - a[1]));
+		for (let i of data.absences) {
+			if (i[1] >= args[1]) {
+				++absentees;
+				absencesEmbed.addField(i[0], `${i[1]} days`);
 			}
 		}
+
+		absencesEmbed.setDescription(`The following ${absentees} people have been absent for ${args[1]}+ days`);
+		//! Failed players should have clock reaction to return to absences (if more than ~5 have failed it is likely the api has been pinged too many times)
+		absencesEmbed.setFooter(
+			`${(Math.ceil(absentees/25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(data.failed.length) ? ", ❗Show failed" : ""}
+			\npage 1 of ${Math.ceil(absentees/25)}`);
 		msg.channel.send(absencesEmbed);
 	}
 };
@@ -76,12 +82,10 @@ async function getAbsences(guild) {
 	}
 	console.log("waiting for player data promises to resolve");
 
-	let result = {absences: {}, failed: []};
+	let result = {absences: new Map(), failed: []};
 	for (let player of await Promise.allSettled(promiseArray)) {
 		try {
-			result.absences[player.value.data[0].username] = daysSince(
-				player.value.data[0].meta.lastJoin
-			);
+			result.absences.set(player.value.data[0].username, daysSince(player.value.data[0].meta.lastJoin));
 		} catch {
 			failed++;
 			result.failed.push(player.value.kind.split("/")[2]);

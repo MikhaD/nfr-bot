@@ -1,9 +1,10 @@
 const config = require("../../config.json");
-const {createErrorEmbed, createWarnEmbed, helpForCommand} = require("./_utility");
+const {createErrorEmbed, createWarnEmbed, parseArguments} = require("./_utility");
 const { MessageEmbed } = require("discord.js");
 
 module.exports = {
 	name: "purge",
+	aliases: ["prune"],
 	args: {
 		required: ["messages"],
 		optional: ["hide success msg"]
@@ -50,7 +51,7 @@ module.exports = {
 		} else {
 			msg.channel.send(createErrorEmbed(
 				"Invalid command syntax",
-				`The syntax for purge is:\n\`${config.prefix}purge${helpForCommand("purge").parameters}\``)
+				`The syntax for purge is:\n\`${config.prefix}purge ${parseArguments(msg.client.commands.get("purge"))}\``)
 			);
 		}
 	}

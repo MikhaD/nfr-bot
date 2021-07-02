@@ -1,5 +1,6 @@
 module.exports = {
 	name: "",
+	aliases: [""],
 	args: {
 		required: [""],
 		optional: [""]

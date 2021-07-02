@@ -1,5 +1,4 @@
 const config = require("../../config.json");
-const helpFile = require("../../help.json");
 const {MessageEmbed} = require("discord.js");
 
 /**
@@ -8,7 +7,7 @@ const {MessageEmbed} = require("discord.js");
  * @param {array} args - User values for the arguments
  * @returns an array of arguments
  */
-module.exports.setDefaultArgs = function setArgs(defaults, args) {
+module.exports.setDefaultArgs = function(defaults, args) {
 	let result = [];
 	for (let i in defaults) {
 		result.push((args.length >= i + 1) ? args[i] : defaults[i]);
@@ -22,7 +21,7 @@ module.exports.setDefaultArgs = function setArgs(defaults, args) {
  * @param {string} text - The embed's text
  * @returns a Discord.MessageEmbed object
  */
-module.exports.createSimpleEmbed = function createSimpleEmbed(title, text) {
+module.exports.createSimpleEmbed = function(title, text) {
 	return new MessageEmbed()
 		.setTitle(title)
 		.setDescription(text)
@@ -35,7 +34,7 @@ module.exports.createSimpleEmbed = function createSimpleEmbed(title, text) {
  * @param {string} text - The embed's text
  * @returns a Discord.MessageEmbed object
  */
-module.exports.createWarnEmbed = function createWarnEmbed(title, text) {
+module.exports.createWarnEmbed = function(title, text) {
 	let result = new module.exports.createSimpleEmbed(title, text);
 	result.setColor(config.embed.colors.warn);
 	return result;
@@ -47,41 +46,34 @@ module.exports.createWarnEmbed = function createWarnEmbed(title, text) {
  * @param {string} text - The embed's text
  * @returns a Discord.MessageEmbed object
  */
-module.exports.createErrorEmbed = function createErrorEmbed(title, text) {
+module.exports.createErrorEmbed = function(title, text) {
 	let result = new module.exports.createSimpleEmbed(title, text);
 	result.setColor(config.embed.colors.error);
 	return result;
 };
 
 /**
- * Return an object containing the help information for a given command
- * @param {string} command - The command to fetch help information for
- * @returns {*} {"description": ..., "example": ..., "parameters": ...}
+ * Parse a command's arguments into a string
+ * @param {Object} command - The command object to parse the arguments for
+ * @returns Argument String
  */
-module.exports.helpForCommand = function helpForCommand(command) {
-	command = command.toLowerCase();
-	if (command in helpFile) {
-		let result = {};
-		result["description"] = helpFile[command].description;
-		result["example"] = `${config.prefix}${helpFile[command].example}`;
-		result["parameters"] = "";
-
-		if ("parameters" in helpFile[command]) {
-			if ("required" in helpFile[command].parameters) {
-				for (let i of helpFile[command].parameters.required) {
-					result["parameters"] += ` <${i}>`;
-				}
-			}
-			if ("optional" in helpFile[command].parameters) {
-				result["parameters"] += " [";
-				for (let i of helpFile[command].parameters.optional) {
-					result["parameters"] += `${i}, `;
-				}
-				result["parameters"] = result["parameters"].slice(0, -2) + "]";
+module.exports.parseArguments = function(command) {
+	let result = "";
+	if (command.args) {
+		if (command.args.required) {
+			for (let arg of command.args.required) {
+				result += `<${arg}> `;
 			}
 		}
-		return result;
-	} else return null;
+		if (command.args.optional) {
+			result += "[";
+			for (let arg of command.args.optional) {
+				result += `${arg}, `;
+			}
+			result = `${result.slice(0, -2)}]`;
+		}
+	}
+	return result;
 };
 
 /**
@@ -89,6 +81,6 @@ module.exports.helpForCommand = function helpForCommand(command) {
  * @param {Number} max - The upper limit (exclusive)
  * @returns {Number} A number between 0 and max
  */
-module.exports.randint = function randint(max) {
+module.exports.randint = function(max) {
 	return Math.floor((max*Math.random()));
 };

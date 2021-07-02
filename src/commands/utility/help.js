@@ -1,11 +1,10 @@
-const helpFile = require("../../help.json");
 const config = require("../../config.json");
-const {createErrorEmbed, createSimpleEmbed, helpForCommand} = require("./_utility");
-const { MessageEmbed } = require("discord.js");
+const {createErrorEmbed, createSimpleEmbed, parseArguments} = require("./_utility");
 
 
 module.exports = {
 	name: "help",
+	aliases: ["commands"],
 	args: {
 		optional: ["command"]
 	},
@@ -14,33 +13,34 @@ module.exports = {
 	cooldown: 2,
 
 	execute(msg, args) {
-		if (args.length > 0) {
-			let command = args[0].toLowerCase();
-			let helpObj = helpForCommand(command);
-			if (helpObj === null) {
-				msg.channel.send(createErrorEmbed(`${config.prefix}${command} is not a valid command`, `Type \`${config.prefix}help\` to see the list of commands.`));
+		const { commands } = msg.client;
+		if (args.length) {
+			const command = commands.get(args[0].toLowerCase()) || commands.find(i => i.aliases && i.aliases.includes(args[0].toLowerCase()));
+			if (command) {
+				let helpEmbed = createSimpleEmbed(`${config.prefix}${command.name} ${parseArguments(command)}`, command.description);
+				if (command.example) helpEmbed.addField("Example:", command.example);
+				if (command.aliases) {
+					let aliasString = "";
+					for (let alias of command.aliases) {
+						if (args[0].toLowerCase() === alias) {
+							alias = `**${alias}**`;
+						}
+						aliasString += `${alias}, `;
+					}
+					helpEmbed.addField("Aliases:", aliasString.slice(0, -2));
+				}
+				helpEmbed.addField("Cooldown:", `${(command.cooldown) ? command.cooldown : config.default_cooldown} seconds`);
+				msg.channel.send(helpEmbed);
 			} else {
-				let embed = createSimpleEmbed(`${config.prefix}${command}${helpObj.parameters}`, helpObj.description);
-				embed.addField("Example:", helpObj.example);
-				msg.channel.send(embed);
+				msg.channel.send(createErrorEmbed(`${config.prefix}${command} is not a valid command`, `Type \`${config.prefix}help\` to see the list of commands.`));
 			}
 		} else {
-			// just loop through them all for now, put them in categories once I have more commands
-			let helpObj = helpForCommand("help");
-			let helpEmbed = new MessageEmbed()
-				.setTitle("Command Help")
-				.setDescription(`Call ${config.prefix}help on a specific command to see an example.`)
-				.setColor(config.embed.colors.default)
-				.addField(`${config.prefix}help${helpObj.parameters}`, helpObj.description)
-				// .setFooter(`\n◀️Previous, ▶️Next\n\npage 1 of ${1}`); //! change this to reflect the actual values
-				.setFooter("\n\npage 1 of 1");
-			for (let cmd of Object.keys(helpFile)) {
-				if (cmd !== "help"){
-					helpObj = helpForCommand(cmd);
-					helpEmbed.addField(`${config.prefix}${cmd}${helpObj.parameters}`, helpObj.description);
-				}
+			let helpEmbed = createSimpleEmbed("Command Help", `Call ${config.prefix}help on a specific command for more information about it.`);
+			for (let cmd of commands) {
+				helpEmbed.addField(`${config.prefix}${cmd[0]} ${parseArguments(cmd[1])}`, cmd[1].description);
 			}
+			helpEmbed.setFooter(`Page 1 of ${Math.ceil(commands.size / 25)}`);
 			msg.channel.send(helpEmbed);
 		}
-	}
+	},
 };

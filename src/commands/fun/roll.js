@@ -3,6 +3,7 @@ const { randint } = require("../utility/_utility");
 
 module.exports = {
 	name: "roll",
+	aliases: ["d", "dice"],
 	args: {
 		optional: ["dice sides"]
 	},
