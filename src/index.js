@@ -1,7 +1,7 @@
 const fs = require("fs");
 const Discord = require("discord.js");
 const config = require("./config.json");
-const { createErrorEmbed } = require("./commands/utility/_utility");
+const { createErrorEmbed, parsePermissions } = require("./commands/utility/_utility");
 
 const client = new Discord.Client({partials: ["MESSAGE", "REACTION"]});
 client.cooldowns = new Discord.Collection();
@@ -34,6 +34,17 @@ client.on("message", async (msg) => {
 		if ((msg.channel.type === "dm" && command.serverOnly)) {
 			msg.channel.send(createErrorEmbed("Incorrect command context", `${command.name} can only be used in servers`));
 			return;
+		}
+
+		//i check if user has permission to use that command
+		if (command.permissions) {
+			const authorPerms = msg.channel.permissionsFor(msg.author);
+			if (!authorPerms || !authorPerms.has(command.permissions)) {
+				const errorEmbed = createErrorEmbed("Inadeqate Permissions", `You do not have adequate permissions to use \`${cmd}\` here.`);
+				errorEmbed.addField(`${cmd} requires:`, parsePermissions(command.permissions));
+				msg.channel.send(errorEmbed);
+				return;
+			}
 		}
 
 		//i cooldown

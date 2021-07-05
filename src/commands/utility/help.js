@@ -1,5 +1,5 @@
 const config = require("../../config.json");
-const {createErrorEmbed, createSimpleEmbed, parseArguments} = require("./_utility");
+const {createErrorEmbed, createSimpleEmbed, parseArguments, parsePermissions} = require("./_utility");
 
 
 module.exports = {
@@ -18,17 +18,19 @@ module.exports = {
 			const command = commands.get(args[0].toLowerCase()) || commands.find(i => i.aliases && i.aliases.includes(args[0].toLowerCase()));
 			if (command) {
 				let helpEmbed = createSimpleEmbed(`${config.prefix}${command.name} ${parseArguments(command)}`, command.description);
-				if (command.example) helpEmbed.addField("Example:", command.example);
+				//i Permissions
+				if (command.permissions) helpEmbed.addField("Permissions:", parsePermissions(command.permissions));
+				//i Example
+				if (command.example) helpEmbed.addField("Example:", `${config.prefix}${command.example}`);
+				//i Aliases
 				if (command.aliases) {
 					let aliasString = "";
 					for (let alias of command.aliases) {
-						if (args[0].toLowerCase() === alias) {
-							alias = `**${alias}**`;
-						}
-						aliasString += `${alias}, `;
+						aliasString += (args[0].toLowerCase() === alias) ? `**${alias}**, ` : `${alias}, `;
 					}
 					helpEmbed.addField("Aliases:", aliasString.slice(0, -2));
 				}
+				//i Cooldown
 				helpEmbed.addField("Cooldown:", `${(command.cooldown) ? command.cooldown : config.default_cooldown} seconds`);
 				msg.channel.send(helpEmbed);
 			} else {

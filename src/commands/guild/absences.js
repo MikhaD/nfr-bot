@@ -11,6 +11,7 @@ module.exports = {
 	description: "List players from a guild who have been absent for <min days> number of days, Nefarious Ravens and 7 days by default.",
 	example: "absences Nefarious Ravens 15",
 	cooldown: 10,
+	permissions: ["ADMINISTRATOR"],
 
 	async execute(msg, args) {
 		//i ######################################## Process arguments #######################################

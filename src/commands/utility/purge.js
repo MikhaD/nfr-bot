@@ -13,6 +13,7 @@ module.exports = {
 	example: "purge 15 true",
 	serverOnly: true,
 	cooldown: 5,
+	permissions: ["ADMINISTRATOR"],
 
 	async execute(msg, args) {
 		if (args.length >= 1 && !isNaN(args[0])) {

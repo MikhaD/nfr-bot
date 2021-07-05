@@ -84,3 +84,9 @@ module.exports.parseArguments = function(command) {
 module.exports.randint = function(max) {
 	return Math.floor((max*Math.random()));
 };
+
+
+module.exports.parsePermissions = function(permsArray) {
+	permsArray = permsArray.toString().replace(",", ", ");
+	return permsArray;
+};

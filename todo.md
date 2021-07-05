@@ -6,6 +6,7 @@
 - store guild object with player data in database & fetch it if query is made again within the hour
 - additional info property that gets displayed when help is called on a specific command
 - replace objects in places like absences with maps
+- if commands have required arguments, check for those in index
 
 
 
@@ -27,3 +28,7 @@
 
 ## Play time in guild
 Track how many hours someone has spent online while in the guild
+
+## Keep track of guild tomes
+- commands to add someone to the list, change peoples position on the list, give them a tome etc.
+- Generates a channel (or is assigned a channel) just for this 
