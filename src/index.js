@@ -80,6 +80,7 @@ client.on("message", async (msg) => {
 });
 
 //i ############################################ Bring bot online ############################################
-// load all env variables in .env file
+//i load all env variables in .env file
 require("dotenv").config();
+//i log in
 client.login(process.env.TOKEN);
