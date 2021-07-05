@@ -1,5 +1,5 @@
 {
-	"prefix": "!",
+	"prefix": "\\",
 	"default_cooldown": 0,
 	"default_guild": "Nefarious Ravens",
 	"min_days": 7,
