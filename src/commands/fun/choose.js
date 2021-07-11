@@ -2,6 +2,7 @@ const { randint } = require("../utility/_utility");
 
 module.exports = {
 	name: "choose",
+	aliases: ["pick"],
 	args: {
 		optional: ["option 1", "option 2", "option 3", "..."]
 	},

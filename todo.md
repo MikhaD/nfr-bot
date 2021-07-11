@@ -7,6 +7,7 @@
 - additional info property that gets displayed when help is called on a specific command
 - replace objects in places like absences with maps
 - if commands have required arguments, check for those in index
+- add doc comments for _utility functions
 
 
 

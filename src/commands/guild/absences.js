@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
 const { MessageEmbed } = require("discord.js");
 const config = require("../../config.json");
-const { createErrorEmbed } = require("../utility/_utility");
+const { createErrorEmbed, fetchPlayer, fetchGuild } = require("../../utility/_utility");
 
 module.exports = {
 	name: "absences",
@@ -95,20 +95,6 @@ async function getAbsences(guild) {
 	}
 	console.log(`retrieved data for ${promiseArray.length-failed} of ${promiseArray.length}`);
 	return result;
-}
-
-async function fetchGuild(name) {
-	let guildData = await fetch(
-		`https://api.wynncraft.com/public_api.php?action=guildStats&command=${name}`
-	);
-	return await guildData.json();
-}
-
-async function fetchPlayer(name) {
-	let playerData = await fetch(
-		`https://api.wynncraft.com/v2/player/${name}/stats`
-	);
-	return await playerData.json();
 }
 
 function daysSince(timeString) {
