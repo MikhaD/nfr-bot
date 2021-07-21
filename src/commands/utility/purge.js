@@ -1,5 +1,5 @@
 const config = require("../../config.json");
-const {createErrorEmbed, createWarnEmbed, parseArguments} = require("./_utility");
+const { createErrorEmbed, createWarnEmbed, parseArguments } = require("../../utility/_utility");
 const { MessageEmbed } = require("discord.js");
 
 module.exports = {
@@ -40,8 +40,8 @@ module.exports = {
 
 			if ((args.length < 2 || args[1].toLowerCase() !== "true") && totalDeleted === messages) {
 				let successEmbed = new MessageEmbed()
-					.setColor(config.embed.colors.success)
-					.setTitle(`${messages -1} message${(messages !== 2) ? "s": ""} deleted from #${msg.channel.name}`)
+					.setColor(config.colors.embed.success)
+					.setTitle(`${messages - 1} message${(messages !== 2) ? "s" : ""} deleted from #${msg.channel.name}`)
 					.setDescription(`Use \`${config.prefix}purge <number of messages> true\` to not show this message`);
 
 				msg.channel.send(successEmbed);

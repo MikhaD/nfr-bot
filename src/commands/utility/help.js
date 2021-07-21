@@ -1,5 +1,5 @@
 const config = require("../../config.json");
-const {createErrorEmbed, createSimpleEmbed, parseArguments, parsePermissions} = require("./_utility");
+const {createErrorEmbed, createSimpleEmbed, parseArguments, parsePermissions} = require("../../utility/_utility");
 
 
 module.exports = {

@@ -29,6 +29,7 @@
 		"yoda": ["warn"],
 		//! always use === instead of ==
 		"eqeqeq": ["warn", "always"],
-		"no-empty": ["warn", { "allowEmptyCatch": true }]
+		"no-empty": ["warn", { "allowEmptyCatch": true }],
+		"for-direction": ["off"]
 	}
 }

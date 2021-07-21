@@ -4,12 +4,24 @@
 	"default_guild": "Nefarious Ravens",
 	"min_days": 7,
 	"defualt_dice": 6,
-	"embed": {
-		"colors": {
+	"colors": {
+		"embed": {
 			"default": "#980F91",
-			"error": "#ff2d00",
+			"error": "#FF5555",
 			"warn": "#FE9713",
-			"success": "#24a400"
+			"success": "#24A400"
+		},
+		"tag": {
+			"null": "#C4AB79",
+			"VIP": "#009B00",
+			"VIP+": "#50AED8",
+			"HERO": "#9B009B",
+			"CHAMPION": "#E9CF4E"
+		},
+		"rank": {
+			"Media": "#E94EE9",
+			"Build": "#009B9B",
+			"Administrator": "#9B0000"
 		}
 	}
 }

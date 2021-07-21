@@ -1,7 +1,9 @@
+global.path = __dirname;
+
 const fs = require("fs");
 const Discord = require("discord.js");
 const config = require("./config.json");
-const { createErrorEmbed, parsePermissions } = require("./commands/utility/_utility");
+const { createErrorEmbed, parsePermissions } = require("./utility/_utility");
 
 const client = new Discord.Client({partials: ["MESSAGE", "REACTION"]});
 client.cooldowns = new Discord.Collection();
@@ -20,6 +22,7 @@ for (let dir of fs.readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/
 
 //i ########################## Send a message to console when the bot has logged in ##########################
 client.once("ready", () => {
+	client.user.setActivity(`${config.prefix}help`, { type: "PLAYING" });
 	console.log(`${client.user.tag} has logged in.`);
 });
 
@@ -35,7 +38,6 @@ client.on("message", async (msg) => {
 			msg.channel.send(createErrorEmbed("Incorrect command context", `${command.name} can only be used in servers`));
 			return;
 		}
-
 		//i check if user has permission to use that command
 		if (command.permissions) {
 			const authorPerms = msg.channel.permissionsFor(msg.author);

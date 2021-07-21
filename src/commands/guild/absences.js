@@ -1,4 +1,3 @@
-const fetch = require("node-fetch");
 const { MessageEmbed } = require("discord.js");
 const config = require("../../config.json");
 const { createErrorEmbed, fetchPlayer, fetchGuild } = require("../../utility/_utility");
@@ -35,7 +34,7 @@ module.exports = {
 		if (data.error) {
 			if (data.error === "Guild not found") {
 				msg.channel.send(createErrorEmbed(
-					`${args[0]} is not a valid guild name`,
+					`Failed to retrieve data for ${args[0]}`,
 					"**Note:** Guild names are case sensitive. You also need to use the full name, not just the prefix (Nefarious Ravens not NFR)"));
 			}
 			return;
@@ -43,8 +42,10 @@ module.exports = {
 
 		//i ########################################## Create embed ##########################################
 		let absencesEmbed = new MessageEmbed()
-			.setColor(config.embed.colors.default)
-			.setTitle(`${args[0]} Absences:`);
+			.setColor(config.colors.embed.default)
+			.setTitle(`${args[0]} Absences:`)
+			.attachFiles(["./src/images/banners/bannerTest.png"])
+			.setThumbnail("attachment://bannerTest.png");
 
 		let absentees = 0;
 		//i Sort absences by time absent
@@ -59,8 +60,8 @@ module.exports = {
 		absencesEmbed.setDescription(`The following ${absentees} people have been absent for ${args[1]}+ days`);
 		//! Failed players should have clock reaction to return to absences (if more than ~5 have failed it is likely the api has been pinged too many times)
 		absencesEmbed.setFooter(
-			`${(Math.ceil(absentees/25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(data.failed.length) ? ", ❗Show failed" : ""}
-			\npage 1 of ${Math.ceil(absentees/25)}`);
+			`${(Math.ceil(absentees / 25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(data.failed.length) ? ", ❗Show failed" : ""}
+			\npage 1 of ${Math.ceil(absentees / 25)}`);
 		msg.channel.send(absencesEmbed);
 	}
 };
@@ -74,7 +75,7 @@ async function getAbsences(guild) {
 
 	let guildJson = await fetchGuild(guild);
 	if (guildJson.error) {
-		return {error: guildJson.error};
+		return { error: guildJson.error };
 	}
 	let promiseArray = [];
 	let failed = 0;
@@ -83,7 +84,7 @@ async function getAbsences(guild) {
 	}
 	console.log("waiting for player data promises to resolve");
 
-	let result = {absences: new Map(), failed: []};
+	let result = { absences: new Map(), failed: [] };
 	for (let player of await Promise.allSettled(promiseArray)) {
 		try {
 			result.absences.set(player.value.data[0].username, daysSince(player.value.data[0].meta.lastJoin));
@@ -93,7 +94,7 @@ async function getAbsences(guild) {
 			console.log(`Failed to retrieve data for ${player.value.kind.split("/")[2]}`);
 		}
 	}
-	console.log(`retrieved data for ${promiseArray.length-failed} of ${promiseArray.length}`);
+	console.log(`retrieved data for ${promiseArray.length - failed} of ${promiseArray.length}`);
 	return result;
 }
 

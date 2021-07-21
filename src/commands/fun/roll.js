@@ -1,5 +1,5 @@
 const config = require("../../config.json");
-const { randint } = require("../utility/_utility");
+const { randint } = require("../../utility/_utility");
 
 module.exports = {
 	name: "roll",
