@@ -1,9 +1,10 @@
 global.path = __dirname;
 
 const { readdirSync } = require("fs");
+const path = require("path");
 const Discord = require("discord.js");
-const config = require("./config.json");
-const { createErrorEmbed, parsePermissions } = require("./utility/_utility");
+const config = require(path.join(__dirname, "./config.json"));
+const { createErrorEmbed, parsePermissions } = require(path.join(__dirname, "./utility/_utility.js"));
 
 const client = new Discord.Client({partials: ["MESSAGE", "REACTION"]});
 client.cooldowns = new Discord.Collection();

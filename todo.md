@@ -9,7 +9,9 @@
     - When the user enters a 3-4 letter name first check hashmap, then try api, if neither work, only then give guild not found error
 - Seperate _utils.js into _fetchUtils, _formatUtils, imageUtils and any other apparent categories (may require some functions to be split up)
 - Validate values like player names and guild names
-
+- Rate limit API pings globally
+- add testing suite
+- changelog will eventually need multiple pages
 
 
 

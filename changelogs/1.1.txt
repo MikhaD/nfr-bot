@@ -1,8 +1,10 @@
-Added image prcessing capability
-added guild banner image to absences command
-Added stats command
-added changelog command
-changed location of utility files
-added check for whether commands have required arguments
-escaped italics in player names
-made some things prettier
+*22/07/2021*
+- Added image prcessing capability
+- Added guild banner image to absences command
+- Added stats command
+- Added changelog command
+- Changed location of utility files
+- Added check for whether commands have required arguments
+- Escaped italics in player names
+- Made some things prettier
+- Added status

@@ -1,6 +1,7 @@
+const path = require("path");
 const { writeFileSync } = require("fs");
 const { loadImage, createCanvas } = require("canvas");
-const { Color } = require("../../utility/_utility");
+const { Color } = require(path.join(__dirname, "../../utility/_utility"));
 
 const wynndataColor = {
 	"VIP": "#009B00",

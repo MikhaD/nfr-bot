@@ -1,5 +1,6 @@
-const config = require("../../config.json");
-const { randint } = require("../../utility/_utility");
+const path = require("path");
+const config = require(path.join(__dirname, "../../config.json"));
+const { randint } = require(path.join(__dirname, "../../utility/_utility"));
 
 module.exports = {
 	name: "roll",

@@ -1,7 +1,7 @@
-const config = require("../../config.json");
-const { createErrorEmbed, createWarnEmbed } = require("../../utility/_utility");
+const path = require("path");
+const config = require(path.join(__dirname, "../../config.json"));
+const { createErrorEmbed, createWarnEmbed } = require(path.join(__dirname, "../../utility/_utility"));
 const { MessageEmbed } = require("discord.js");
-const help = require("./help");
 
 module.exports = {
 	name: "purge",

@@ -1,6 +1,6 @@
 {
   "name": "nfr-bot",
-  "version": "1.1",
+  "version": "1.1.1",
   "description": "A Wynncraft discord bot for use by the Nefarious Ravens guild",
   "main": "index.js",
   "scripts": {

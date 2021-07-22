@@ -1,4 +1,5 @@
-const { randint } = require("../../utility/_utility");
+const path = require("path");
+const { randint } = require(path.join(__dirname, "../../utility/_utility"));
 
 module.exports = {
 	name: "choose",

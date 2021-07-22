@@ -1,9 +1,8 @@
-const { createSimpleEmbed, createErrorEmbed } = require("../../utility/_utility");
-const pkg = require("../../../package.json");
-const { readdirSync, readFileSync } = require("fs");
 const path = require("path");
-const { version } = require("canvas");
-
+const { createErrorEmbed } = require(path.join(__dirname, "../../utility/_utility"));
+const pkg = require(path.join(__dirname, "../../../package.json"));
+const { readdirSync, readFileSync } = require("fs");
+const { MessageEmbed } = require("discord.js");
 
 module.exports = {
 	name: "changelog",
@@ -18,22 +17,35 @@ module.exports = {
 	execute(msg, args) {
 		const logsPath = path.join(__dirname, "../../../changelogs");
 		const versions = readdirSync(logsPath);
-		let log, version;
+		const changelog = new MessageEmbed();
 		if (args.length > 0) {
 			if (versions.includes(`${args[0]}.txt`)) {
-				version = args[0];
-				log = readFileSync(`${logsPath}/${version}.txt`).toString();
+				changelog.setTitle(`Version ${args[0]} changelog:`);
+				changelog.setDescription(readFileSync(`${logsPath}/${args[0]}.txt`).toString());
+				changelog.setAuthor(`Current version: ${pkg.version}`);
 			} else {
 				msg.channel.send(createErrorEmbed("", `${args[0]} is not a valid version number`));
 				return;
 			}
 		} else {
-			version = pkg.version;
-			log = readFileSync(`${logsPath}/${pkg.version}.txt`).toString();
+			for (const version of versions.sort(s)) {
+				changelog.addField(`Version ${version.slice(0, -4)} changelog:`, readFileSync(`${logsPath}/${version}`).toString());
+			}
 		}
-		const changelog = createSimpleEmbed(`Changelog for version ${version}`, log);
-		changelog.setAuthor(`Current version: ${pkg.version}`);
 		changelog.setThumbnail(msg.client.user.avatarURL());
 		msg.channel.send(changelog);
 	}
+};
+
+let s = function(a, b) {
+	const result = [0, 0];
+	const input = [a, b];
+	for (let i = 0; i < input.length; ++i) {
+		input[i] = input[i].slice(0, -4).split(".").map(j => parseInt(j));
+		while (input[i].length < 3) {input[i].push(0);}
+		for (let k = 0; k < input[i].length; ++k) {
+			result[i] += input[i][k] * 10**(input[i].length - (k + 1));
+		}
+	}
+	return result[1] - result[0];
 };

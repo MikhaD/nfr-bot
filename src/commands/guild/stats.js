@@ -1,5 +1,6 @@
-const { fetchPlayer, createErrorEmbed, toTitleCase, makeDateFriendly, spaceNumber, asHours, asDistance, createRankImage, spaceBetween, fetchPlayerFace, fetchForumData } = require("../../utility/_utility");
-const config = require("../../config.json");
+const path = require("path");
+const { fetchPlayer, createErrorEmbed, toTitleCase, makeDateFriendly, spaceNumber, asHours, asDistance, createRankImage, spaceBetween, fetchPlayerFace, fetchForumData } = require(path.join(__dirname, "../../utility/_utility"));
+const config = require(path.join(__dirname, "../../config.json"));
 const { MessageAttachment, MessageEmbed } = require("discord.js");
 
 module.exports = {

@@ -1,6 +1,7 @@
+const path = require("path");
 const { MessageAttachment, Util } = require("discord.js");
-const config = require("../../config.json");
-const { createErrorEmbed, fetchPlayer, fetchGuild, createSimpleEmbed, createBannerImage } = require("../../utility/_utility");
+const config = require(path.join(__dirname, "../../config.json"));
+const { createErrorEmbed, fetchPlayer, fetchGuild, createSimpleEmbed, createBannerImage } = require(path.join(__dirname, "../../utility/_utility"));
 
 module.exports = {
 	name: "absences",

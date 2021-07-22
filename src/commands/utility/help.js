@@ -1,5 +1,6 @@
-const config = require("../../config.json");
-const {createErrorEmbed, createSimpleEmbed, parseArguments, parsePermissions} = require("../../utility/_utility");
+const path = require("path");
+const config = require(path.join(__dirname, "../../config.json"));
+const { createErrorEmbed, createSimpleEmbed, parseArguments, parsePermissions } = require(path.join(__dirname, "../../utility/_utility"));
 
 
 module.exports = {

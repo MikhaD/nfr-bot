@@ -1,4 +1,5 @@
-const config = require("../config.json");
+const path = require("path");
+const config = require(path.join(__dirname, "../config.json"));
 const { MessageEmbed } = require("discord.js");
 const { createCanvas, loadImage } = require("canvas");
 const fetch = require("node-fetch");
