@@ -1,6 +1,6 @@
-const { MessageEmbed } = require("discord.js");
+const { MessageAttachment, Util } = require("discord.js");
 const config = require("../../config.json");
-const { createErrorEmbed, fetchPlayer, fetchGuild } = require("../../utility/_utility");
+const { createErrorEmbed, fetchPlayer, fetchGuild, createSimpleEmbed, createBannerImage } = require("../../utility/_utility");
 
 module.exports = {
 	name: "absences",
@@ -9,83 +9,89 @@ module.exports = {
 	},
 	description: "List players from a guild who have been absent for <min days> number of days, Nefarious Ravens and 7 days by default.",
 	example: "absences Nefarious Ravens 15",
-	cooldown: 10,
+	cooldown: 30,
 	permissions: ["ADMINISTRATOR"],
 
 	async execute(msg, args) {
 		//i ######################################## Process arguments #######################################
-		let guild = config.default_guild;
+		let guildName = config.default_guild;
 		if (args.length > 0) {
-			guild = "";
+			guildName = "";
 			while (args.length) {
 				if (isNaN(args[0])) {
-					guild += `${args.shift()} `;
+					guildName += `${args.shift()} `;
 				} else break;
 			}
 		}
-		args.unshift(guild.trim());
-		if (args.length === 1) {
-			args.push(config.min_days);
-		}
-		args[1] = Number(args[1]);
+		guildName = guildName.trim();
+		const period = parseInt((args.length === 0) ? config.min_days : args[0]);
 
 		//i #################################### Fetch absent players data ###################################
-		let data = await getAbsences(args[0]);
-		if (data.error) {
-			if (data.error === "Guild not found") {
+		const guild = await fetchGuild(guildName);
+		if (guild.error) {
+			if (guild.error === "Guild not found") {
 				msg.channel.send(createErrorEmbed(
-					`Failed to retrieve data for ${args[0]}`,
+					`Failed to retrieve data for ${guildName}`,
 					"**Note:** Guild names are case sensitive. You also need to use the full name, not just the prefix (Nefarious Ravens not NFR)"));
+			} else {
+				msg.channel.send(`Failed to retrieve data for ${guildName}`, guild.error);
 			}
 			return;
 		}
 
+		const AbsenteeData = await getAbsenteeData(guild.members);
+
 		//i ########################################## Create embed ##########################################
-		let absencesEmbed = new MessageEmbed()
-			.setColor(config.colors.embed.default)
-			.setTitle(`${args[0]} Absences:`)
-			.attachFiles(["./src/images/banners/bannerTest.png"])
-			.setThumbnail("attachment://bannerTest.png");
+		const embed = createSimpleEmbed(`${guildName} Absences:`);
+
+		if (guild.banner) {
+			const attachmentName = "rankImage.png";
+			const attachment = new MessageAttachment(await createBannerImage(guild.banner), attachmentName);
+			embed.attachFiles([attachment]);
+			embed.setThumbnail(`attachment://${attachmentName}`);
+		}
 
 		let absentees = 0;
 		//i Sort absences by time absent
-		data.absences = new Map([...data.absences.entries()].sort((a, b) => b[1] - a[1]));
-		for (let i of data.absences) {
-			if (i[1] >= args[1]) {
+		AbsenteeData.absences = new Map([...AbsenteeData.absences.entries()].sort((a, b) => b[1] - a[1]));
+		for (const i of AbsenteeData.absences) {
+			if (i[1] >= period) {
 				++absentees;
-				absencesEmbed.addField(i[0], `${i[1]} days`);
+				embed.addField(Util.escapeItalic(i[0]), `${i[1]} days`);
 			}
 		}
+		embed.setDescription(`The following ${absentees} people have been absent for ${period}+ days`);
 
-		absencesEmbed.setDescription(`The following ${absentees} people have been absent for ${args[1]}+ days`);
 		//! Failed players should have clock reaction to return to absences (if more than ~5 have failed it is likely the api has been pinged too many times)
-		absencesEmbed.setFooter(
-			`${(Math.ceil(absentees / 25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(data.failed.length) ? ", ❗Show failed" : ""}
+		embed.setFooter(
+			`${(Math.ceil(absentees / 25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(AbsenteeData.failed.length) ? ", ❗Show failed" : ""}
 			\npage 1 of ${Math.ceil(absentees / 25)}`);
-		msg.channel.send(absencesEmbed);
+		msg.channel.send(embed);
 	}
 };
 
-async function getAbsences(guild) {
+/**
+ * Return an object containing how long each member has been offline for
+ * @param {object} members - The members object from a guild object from the Wynncraft API
+ * @returns An object in the form {absences: Map, failed: Array} with absences containing key value
+ * pairs of playerName: days absent, and failed containing a list of players who's data failed to get retrieved
+ */
+async function getAbsenteeData(members) {
 	// check if guild is in database and when it was put there
 	// get guild info from api
 	// get all the player names
 	// query each player name & check last login
 	// store info for this guild in database
 
-	let guildJson = await fetchGuild(guild);
-	if (guildJson.error) {
-		return { error: guildJson.error };
-	}
-	let promiseArray = [];
+	const promiseArray = [];
 	let failed = 0;
-	for (let member of guildJson.members) {
+	for (const member of members) {
 		promiseArray.push(fetchPlayer(member.name));
 	}
 	console.log("waiting for player data promises to resolve");
 
-	let result = { absences: new Map(), failed: [] };
-	for (let player of await Promise.allSettled(promiseArray)) {
+	const result = { absences: new Map(), failed: [] };
+	for (const player of await Promise.allSettled(promiseArray)) {
 		try {
 			result.absences.set(player.value.data[0].username, daysSince(player.value.data[0].meta.lastJoin));
 		} catch {
@@ -99,17 +105,16 @@ async function getAbsences(guild) {
 }
 
 function daysSince(timeString) {
-	let time = [];
+	const time = [];
 	let previous = 0;
-	for (let i in timeString) {
+	for (const i in timeString) {
 		if (isNaN(timeString[i])) {
-			time.push(Number(timeString.substring(previous, i)));
-			previous = Number(i) + 1;
+			time.push(parseInt(timeString.substring(previous, i)));
+			previous = parseInt(i) + 1;
 		}
 	}
-	let milliseconds =
-		new Date() -
-		new Date(time[0], time[1] - 1, time[2], time[3], time[4], time[5], time[6]);
+	const milliseconds =
+		new Date() - new Date(time[0], time[1] - 1, time[2], time[3], time[4], time[5], time[6]);
 	//i 84 400 000 milliseconds per day
 	return Math.floor(milliseconds / 86400000);
 }

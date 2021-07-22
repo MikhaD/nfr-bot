@@ -1,6 +1,6 @@
 global.path = __dirname;
 
-const fs = require("fs");
+const { readdirSync } = require("fs");
 const Discord = require("discord.js");
 const config = require("./config.json");
 const { createErrorEmbed, parsePermissions } = require("./utility/_utility");
@@ -12,10 +12,10 @@ const { cooldowns } = client;
 //i ############ get all commands from file and set them as properties of the client object (bot) ############
 client.commands = new Discord.Collection();
 //match dirs that don't start with _
-for (let dir of fs.readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.test(dir))) {
+for (const dir of readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.test(dir))) {
 	//match files that end in .js and don't start with _
-	for (let file of fs.readdirSync(`${__dirname}/commands/${dir}`).filter(file => /^[^_].*\.js$/.test(file))) {
-		let command = require(`./commands/${dir}/${file}`);
+	for (const file of readdirSync(`${__dirname}/commands/${dir}`).filter(file => /^[^_].*\.js$/.test(file))) {
+		const command = require(`./commands/${dir}/${file}`);
 		client.commands.set(command.name, command);
 	}
 }
@@ -32,7 +32,7 @@ client.on("message", async (msg) => {
 	let [cmd, ...args] = msg.content.slice(config.prefix.length).split(/\s+/);
 	cmd = cmd.toLowerCase();
 
-	let command = client.commands.get(cmd) || client.commands.find(i => i.aliases && i.aliases.includes(cmd)); //i get command & check aliases if not a command
+	const command = client.commands.get(cmd) || client.commands.find(i => i.aliases && i.aliases.includes(cmd)); //i get command & check aliases if not a command
 	if (command) {
 		if ((msg.channel.type === "dm" && command.serverOnly)) {
 			msg.channel.send(createErrorEmbed("Incorrect command context", `${command.name} can only be used in servers`));
@@ -53,16 +53,22 @@ client.on("message", async (msg) => {
 		if (!cooldowns.has(command.name)) {
 			cooldowns.set(command.name, new Discord.Collection());
 		}
-		let now = Date.now();
-		let timestamps = cooldowns.get(command.name);
-		let cooldown = (command.cooldown || config.default_cooldown) * 1000;
+		const now = Date.now();
+		const timestamps = cooldowns.get(command.name);
+		const cooldown = (command.cooldown || config.default_cooldown) * 1000;
 
 		if (timestamps.has(msg.author.id)) {
-			let expirationTime = timestamps.get(msg.author.id) + cooldown;
+			const expirationTime = timestamps.get(msg.author.id) + cooldown;
 			if (now < expirationTime) return;
 		}
 		timestamps.set(msg.author.id, now);
 		setTimeout(() => timestamps.delete(msg.author.id), cooldown);
+
+		//i ensure commands with required arguments have at least that many arguments
+		if (command.args.required && command.args.required.length > args.length) {
+			client.commands.get("help").execute(msg, [cmd]);
+			return;
+		}
 
 		//i try to execute command
 		try {

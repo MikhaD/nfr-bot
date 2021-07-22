@@ -2,17 +2,13 @@
 - instead of a parameter to get rid of times to make copying easier have reactions below message
 - multiple pages if there are more than 25 people absent
 - Failed page with names of players who's data failed to get retrieved on reacting to ❗ if there are failed players
-- Prevent names like _Wahoo_ from being interpreted as italic
 - store guild object with player data in database & fetch it if query is made again within the hour
-- additional info property that gets displayed when help is called on a specific command
-- replace objects in places like absences with maps
 - if commands have required arguments, check for those in index
 - add guild stats/info command
 - programatically create hashmap of guild prefixes to names. Update when a 3-4 letter user input is not in the hashmap
     - When the user enters a 3-4 letter name first check hashmap, then try api, if neither work, only then give guild not found error
-- Think about caching banner images and player skins
-return path of image or null createBnnerImage and fetchPlayerFace
-
+- Seperate _utils.js into _fetchUtils, _formatUtils, imageUtils and any other apparent categories (may require some functions to be split up)
+- Validate values like player names and guild names
 
 
 
@@ -36,7 +32,4 @@ Track how many hours someone has spent online while in the guild
 
 ## Keep track of guild tomes
 - commands to add someone to the list, change peoples position on the list, give them a tome etc.
-- Generates a channel (or is assigned a channel) just for this 
-
-# Problems
-- Unable to use embed.setThumbnail() for images from apis that don't have file name extensions (like https://visage.surgeplay.com/bust/80/499985df2ab54139a1cf564b5a72fdb3)
+- Generates a channel (or is assigned a channel) just for this

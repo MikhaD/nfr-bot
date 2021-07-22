@@ -43,8 +43,7 @@ module.exports = {
 			(str !== "") ? newArgs.push(str) : false;
 
 			//i ############################# choose and return a random argument ############################
-			let choice = randint(newArgs.length);
-			msg.channel.send(newArgs[choice]);
+			msg.channel.send(newArgs[randint(newArgs.length)]);
 		}
 	}
 };

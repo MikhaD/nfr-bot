@@ -1,7 +1,6 @@
 const config = require("../config.json");
 const { MessageEmbed } = require("discord.js");
 const { createCanvas, loadImage } = require("canvas");
-const { writeFileSync } = require("fs");
 const fetch = require("node-fetch");
 
 /**
@@ -11,8 +10,8 @@ const fetch = require("node-fetch");
  * @returns an array of arguments
  */
 module.exports.setDefaultArgs = function(defaults, args) {
-	let result = [];
-	for (let i in defaults) {
+	const result = [];
+	for (const i in defaults) {
 		result.push((args.length >= i + 1) ? args[i] : defaults[i]);
 	}
 	return result;
@@ -38,7 +37,7 @@ module.exports.createSimpleEmbed = function(title, text) {
  * @returns a Discord.MessageEmbed object
  */
 module.exports.createWarnEmbed = function(title, text) {
-	let result = new exports.createSimpleEmbed(title, text);
+	const result = new exports.createSimpleEmbed(title, text);
 	result.setColor(config.colors.embed.warn);
 	return result;
 };
@@ -50,7 +49,7 @@ module.exports.createWarnEmbed = function(title, text) {
  * @returns a Discord.MessageEmbed object
  */
 module.exports.createErrorEmbed = function(title, text) {
-	let result = new exports.createSimpleEmbed(title, text);
+	const result = new exports.createSimpleEmbed(title, text);
 	result.setColor(config.colors.embed.error);
 	return result;
 };
@@ -64,13 +63,13 @@ module.exports.parseArguments = function(command) {
 	let result = "";
 	if (command.args) {
 		if (command.args.required) {
-			for (let arg of command.args.required) {
+			for (const arg of command.args.required) {
 				result += `<${arg}> `;
 			}
 		}
 		if (command.args.optional) {
 			result += "[";
-			for (let arg of command.args.optional) {
+			for (const arg of command.args.optional) {
 				result += `${arg}, `;
 			}
 			result = `${result.slice(0, -2)}]`;
@@ -105,7 +104,7 @@ module.exports.parsePermissions = function(permsArray) {
 module.exports.Color = class Color {
 	constructor(hexString) {
 		/** multiplier */
-		let x = (hexString.length > 4) ? 2 : 1;
+		const x = (hexString.length > 4) ? 2 : 1;
 		if (hexString.startsWith("#")) hexString = hexString.slice(1);
 		this.r = parseInt(hexString.slice(0, x * 1), 16);
 		this.g = parseInt(hexString.slice(x * 1, x * 2), 16);
@@ -144,14 +143,13 @@ module.exports.colors = {
 };
 
 /**
- * Generate a png of a guilds banner using the banner object from a guild object, saving it as a .png
- * @param {*} data - The banner object of a guild object from the wynncraft api
- * @param {*} path - The destination path for the image, ending in the image file name without the extension
- * @returns The file path of the image or null if failed
+ * Generate a guilds banner image using the banner object from a guild object
+ * @param {Object} data - The banner object of a guild object from the wynncraft api
+ * @returns A buffer object of the banner image or null if failed
  */
-module.exports.createBannerImage = async function(data, path) {
+module.exports.createBannerImage = async function(data) {
 	const width = 40;
-	const height = 80;
+	const height = width*2;
 	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext("2d");
 
@@ -159,35 +157,33 @@ module.exports.createBannerImage = async function(data, path) {
 	ctx.fillRect(0, 0, width, height);
 
 	try {
-		for (let layer of data.layers) {
-			let tempCanv = createCanvas(width, height);
-			let tempCtx = tempCanv.getContext("2d");
+		for (const layer of data.layers) {
+			const tempCanv = createCanvas(width, height);
+			const tempCtx = tempCanv.getContext("2d");
 			tempCtx.imageSmoothingEnabled = false;
-			let img = await loadImage(`./src/images/banners/patterns/${layer.pattern.toLowerCase()}.png`);
+			const img = await loadImage(`./src/images/banners/patterns/${layer.pattern.toLowerCase()}.png`);
 			tempCtx.drawImage(img, 0, 0, width, height);
 
-			let imgData = tempCtx.getImageData(0, 0, width, height);
+			const imgData = tempCtx.getImageData(0, 0, width, height);
 			for (let i = 0; i < imgData.data.length; i += 4) {
 				imgData.data.set([...exports.colors[layer.colour.toLowerCase()].rgbArray()], i);
 			}
 			tempCtx.putImageData(imgData, 0, 0);
-			img = await loadImage(tempCanv.toBuffer("image/png"));
-			ctx.drawImage(img, 0, 0, width, height);
+			ctx.drawImage(tempCanv, 0, 0, width, height);
 		}
-		writeFileSync(`${path}.png`, canvas.toBuffer("image/png"));
-		return `${path}.png`;
-	} catch {
+		return canvas.toBuffer("image/png");
+	} catch (e) {
+		console.log(e);
 		return null;
 	}
 };
 
 /**
- * Fetch the skin of the player with the given uuid and extract the face, saving it as a .png
- * @param {*} uuid - The uuid of the player who's face you'd like to fetch
- * @param {*} path - The destination path for the image, ending in the image file name without the extension
- * @returns The file path of the face image or null if failed
+ * Fetch the skin of the player with the given uuid and extract the face
+ * @param {String} uuid - The uuid of the player who's face you'd like to fetch
+ * @returns A buffer object of the face image or null if failed
  */
-module.exports.fetchPlayerFace = async function(uuid, path) {
+module.exports.fetchPlayerFace = async function(uuid) {
 	try {
 		let obj = (await (await fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${uuid}`))
 			.json()).properties[0].value;
@@ -203,21 +199,26 @@ module.exports.fetchPlayerFace = async function(uuid, path) {
 
 		ctx.drawImage(img, 8, 8, 8, 8, 0, 0, size, size);
 		ctx.drawImage(img, 40, 8, 8, 8, 0, 0, size, size);
-		writeFileSync(`${path}.png`, canvas.toBuffer("image/png"));
-		return `${path}.png`;
+
+		return canvas.toBuffer("image/png");
 	} catch (e) {
 		console.log(e);
 		return null;
 	}
 };
 
+/**
+ * Fetch a bust image of the player with the given uuid and add their rank on a plaque below if they have one
+ * @param {String} uuid - The uuid of the player who's skin will be used
+ * @param {String} rank - The rank to place below the player's image
+ * @returns A buffer object of the bust image or null if failed
+ */
 module.exports.createRankImage = async function(uuid, rank) {
 	const size = 240;
 	try {
-		let img = await (await fetch(`https://visage.surgeplay.com/bust/${size}/${uuid.replaceAll("-", "")}.png`)).buffer();
-		img = loadImage(img);
+		let img = loadImage(await (await fetch(`https://visage.surgeplay.com/bust/${size}/${uuid}.png`)).buffer());
 
-		const canvas = createCanvas(size, size + 90);
+		const canvas = createCanvas(size, size + 78);
 		const ctx = canvas.getContext("2d");
 		ctx.imageSmoothingEnabled = false;
 
@@ -227,7 +228,7 @@ module.exports.createRankImage = async function(uuid, rank) {
 		}
 
 		// writeFileSync("./test.png", canvas.toBuffer());
-		return canvas.toBuffer();
+		return canvas.toBuffer("image/png");
 	} catch (e) {
 		console.log(e);
 		return null;
@@ -252,7 +253,7 @@ module.exports.fetchGuild = async function(name) {
  * @returns - The player object or an object containing an error
  */
 module.exports.fetchPlayer = async function(name) {
-	let playerData = await fetch(
+	const playerData = await fetch(
 		`https://api.wynncraft.com/v2/player/${name}/stats`
 	);
 	return await playerData.json();
@@ -334,4 +335,28 @@ module.exports.asDistance = function(num) {
 module.exports.getUuid = async function(name) {
 	const obj = await (await fetch(`https://api.mojang.com/users/profiles/minecraft/${name}`)).json();
 	return obj.id;
+};
+
+/**
+ * Format two strings with the maximum amount of space between them within the given number of characters
+ * @param {String} str1 - The string on the left
+ * @param {String} str2 - The string on the right
+ * @param {Number} totalSpace - The number of characters to fit the text into
+ * @returns The formatted string
+ */
+module.exports.spaceBetween = function(str1, str2, totalSpace) {
+	totalSpace -= (String(str1).length + String(str2).length);
+	return `${str1}${(totalSpace >= 0) ? " ".repeat(totalSpace) : ""}${str2}`;
+};
+
+/**
+ * Fetch the forum ID and username of a given player, if they exist
+ * @param {String} name - The name of the player who's forum ID you'd like to fetch
+ * @returns An object containing the forum ID and username of the player if they exist, else null
+ */
+module.exports.fetchForumData = async function(name) {
+	const forumData = await(await fetch(`https://api.wynncraft.com/forums/getForumId/${name}`)).json();
+	if (forumData.id) {
+		return {id: forumData.id, username: forumData.username};
+	} else return null;
 };

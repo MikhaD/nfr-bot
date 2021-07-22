@@ -22,19 +22,23 @@ const textColor = {
 };
 
 async function recolor(color, rank) {
+	const width = 240;
+	// const height = 80;
+	const height = 68;
 	const bgImg = await loadImage("./background.png");
 	const txtImg = loadImage(`./.${rank}.png`);
-	const canvas = createCanvas(240, 80);
+	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext("2d");
 	ctx.imageSmoothingEnabled = false;
 
 	ctx.drawImage(bgImg, 0, 0);
-	let imgData = ctx.getImageData(0, 0, 240, 80);
+	const imgData = ctx.getImageData(0, 0, width, height);
 	for (let j = 0; j < imgData.data.length; j += 4) {
 		imgData.data.set([...(new Color(color)).rgbArray()], j);
 	}
 	ctx.putImageData(imgData, 0, 0);
-	ctx.drawImage(await txtImg, 0, 0);
+	// ctx.drawImage(await txtImg, 0, 0);
+	ctx.drawImage(await txtImg, 0, 6, 240, 68, 0, 2, width, height);
 
 	writeFileSync(`./${rank}.png`, canvas.toBuffer());
 }
@@ -42,7 +46,7 @@ async function recolor(color, rank) {
 (async () => {
 	//i Change this variable to change the color scheme
 	const color = wynndataColor;
-	for (let i in color) {
+	for (const i in color) {
 		await recolor(color[i], i);
 	}
 })();
