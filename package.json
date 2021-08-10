@@ -1,19 +1,26 @@
 {
   "name": "nfr-bot",
-  "version": "1.1.1",
+  "author": "MikhaD",
+  "version": "3.0.0",
   "description": "A Wynncraft discord bot for use by the Nefarious Ravens guild",
+  "keywords": ["discord", "bot", "minecraft", "wynncraft"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MikhaD/nfr-bot"
+  },
+  "license": "ISC",
+  "private": "true",
+
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./src/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "canvas": "^2.8.0",
-    "discord.js": "^12.5.3",
+    "discord.js": "^13.0.0",
     "dotenv": "^10.0.0",
+    "mongoose": "^5.13.3",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {

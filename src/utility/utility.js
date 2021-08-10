@@ -24,11 +24,23 @@ module.exports.setDefaultArgs = function(defaults, args) {
  * @param {string} text - The embed's text
  * @returns a Discord.MessageEmbed object
  */
-module.exports.createSimpleEmbed = function(title, text) {
+module.exports.createStandardEmbed = function(title, text) {
 	return new MessageEmbed()
 		.setTitle(title)
 		.setDescription(text)
 		.setColor(config.colors.embed.default);
+};
+
+/**
+ * Create a standard success embed (green highlight)
+ * @param {string} title - The embed's title
+ * @param {string} text - The embed's text
+ * @returns a Discord.MessageEmbed object
+ */
+module.exports.createSuccessEmbed = function(title, text) {
+	const result = new exports.createStandardEmbed(title, text);
+	result.setColor(config.colors.embed.success);
+	return result;
 };
 
 /**
@@ -38,7 +50,7 @@ module.exports.createSimpleEmbed = function(title, text) {
  * @returns a Discord.MessageEmbed object
  */
 module.exports.createWarnEmbed = function(title, text) {
-	const result = new exports.createSimpleEmbed(title, text);
+	const result = new exports.createStandardEmbed(title, text);
 	result.setColor(config.colors.embed.warn);
 	return result;
 };
@@ -50,7 +62,7 @@ module.exports.createWarnEmbed = function(title, text) {
  * @returns a Discord.MessageEmbed object
  */
 module.exports.createErrorEmbed = function(title, text) {
-	const result = new exports.createSimpleEmbed(title, text);
+	const result = new exports.createStandardEmbed(title, text);
 	result.setColor(config.colors.embed.error);
 	return result;
 };
@@ -65,27 +77,29 @@ module.exports.parseArguments = function(command) {
 	if (command.args) {
 		if (command.args.required) {
 			for (const arg of command.args.required) {
-				result += `<${arg}> `;
+				result += `<\`${arg}\`> `;
 			}
 		}
 		if (command.args.optional) {
 			result += "[";
 			for (const arg of command.args.optional) {
-				result += `${arg}, `;
+				result += `\`${arg}\` `;
 			}
-			result = `${result.slice(0, -2)}]`;
+			result = `${result.slice(0, -1)}]`;
 		}
 	}
 	return result;
 };
 
 /**
- * Generate a random integer between 0 and max (exclusive)
+ * Generate a random integer between min and max (exclusive)
  * @param {Number} max - The upper limit (exclusive)
+ * @param {Number} min - The lower limit, defaults to 0 if not specified (inclusive)
  * @returns {Number} A number between 0 and max
  */
-module.exports.randint = function(max) {
-	return Math.floor((max * Math.random()));
+module.exports.randint = function(max, min) {
+	if (arguments.length < 2) { min = 0; }
+	return min + Math.floor((max - min) * Math.random());
 };
 
 /**
@@ -150,7 +164,7 @@ module.exports.colors = {
  */
 module.exports.createBannerImage = async function(data) {
 	const width = 40;
-	const height = width*2;
+	const height = width * 2;
 	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext("2d");
 
@@ -225,7 +239,7 @@ module.exports.createRankImage = async function(uuid, rank) {
 
 		ctx.drawImage(await img, 0, 0);
 		if (["CHAMPION", "HERO", "VIP+", "VIP"].includes(rank)) {
-			ctx.drawImage(await loadImage(`./src/images/ranks/${rank}.png`), 0, size+10);
+			ctx.drawImage(await loadImage(`./src/images/ranks/${rank}.png`), 0, size + 10);
 		}
 
 		// writeFileSync("./test.png", canvas.toBuffer());
@@ -298,7 +312,7 @@ module.exports.spaceNumber = function(num) {
 	num = `${num}`;
 	let result = "";
 	for (let i = 1; i <= num.length; ++i) {
-		result = `${num.charAt(num.length - i)}${((i-1) % 3 === 0) ? " " : ""}${result}`;
+		result = `${num.charAt(num.length - i)}${((i - 1) % 3 === 0) ? " " : ""}${result}`;
 	}
 	return result.trim();
 };
@@ -308,7 +322,7 @@ module.exports.spaceNumber = function(num) {
  * @param {number} num - The number to format
  */
 module.exports.asHours = function(num) {
-	const hours = Math.floor(num/60);
+	const hours = Math.floor(num / 60);
 	const minutes = num - (hours * 60);
 	return `${hours >= 1 ? `${exports.spaceNumber(hours)}h ` : ""}${minutes}m`;
 };
@@ -318,8 +332,8 @@ module.exports.asHours = function(num) {
  * @param {number} num - The number to format
  */
 module.exports.asDays = function(num) {
-	const days = Math.floor(num/1440);
-	const hours = Math.floor((num - (days * 1440))/60);
+	const days = Math.floor(num / 1440);
+	const hours = Math.floor((num - (days * 1440)) / 60);
 	const minutes = num - (days * 1440 + hours * 60);
 	return `${days >= 1 ? `${exports.spaceNumber(days)}d ` : ""}${hours >= 1 ? `${hours}h ` : ""}${minutes}m`;
 };
@@ -330,7 +344,7 @@ module.exports.asDays = function(num) {
  * @returns A formatted string
  */
 module.exports.asDistance = function(num) {
-	return `${num/1000 >= 1 ? `${exports.spaceNumber(Math.floor(num/1000))}km ` : ""}${num % 1000}m`;
+	return `${num / 1000 >= 1 ? `${exports.spaceNumber(Math.floor(num / 1000))}km ` : ""}${num % 1000}m`;
 };
 
 module.exports.getUuid = async function(name) {
@@ -356,8 +370,12 @@ module.exports.spaceBetween = function(str1, str2, totalSpace) {
  * @returns An object containing the forum ID and username of the player if they exist, else null
  */
 module.exports.fetchForumData = async function(name) {
-	const forumData = await(await fetch(`https://api.wynncraft.com/forums/getForumId/${name}`)).json();
+	const forumData = await (await fetch(`https://api.wynncraft.com/forums/getForumId/${name}`)).json();
 	if (forumData.id) {
-		return {id: forumData.id, username: forumData.username};
+		return { id: forumData.id, username: forumData.username };
 	} else return null;
+};
+
+module.exports.createButton = function() {
+
 };
