@@ -7,9 +7,6 @@ module.exports = {
 		description: "",
 		required: false
 	}],
-	example: "",
-	cooldown: 5,
-	permissions: ["ADMINISTRATOR"],
 	execute(interaction) {
 		return interaction.followUp("No code here yet");
 	}

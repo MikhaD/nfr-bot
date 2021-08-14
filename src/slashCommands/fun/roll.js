@@ -1,5 +1,6 @@
 const path = require("path");
 const { randint } = require(path.join(__dirname, "../../utility/utility"));
+const config = require(path.join(__dirname, "../../config.json"));
 
 module.exports = {
 	name: "roll",
@@ -10,9 +11,8 @@ module.exports = {
 		description: "The number of sides on the die",
 		required: false
 	}],
-	example: "roll 20",
 	execute(interaction) {
-		// interaction.followUp(`${randint(sides) + 1}`);
-		interaction.followUp(`${interaction.options.array()}`);
+		const sides = interaction.options.getInteger("sides");
+		interaction.followUp(`${randint(sides ? sides : config.defualt_dice) + 1}`);
 	}
 };

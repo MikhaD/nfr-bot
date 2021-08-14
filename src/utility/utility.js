@@ -26,8 +26,8 @@ module.exports.setDefaultArgs = function(defaults, args) {
  */
 module.exports.createStandardEmbed = function(title, text) {
 	return new MessageEmbed()
-		.setTitle(title)
-		.setDescription(text)
+		.setTitle(`${title}`)
+		.setDescription(`${text}`)
 		.setColor(config.colors.embed.default);
 };
 
@@ -92,10 +92,10 @@ module.exports.parseArguments = function(command) {
 };
 
 /**
- * Generate a random integer between min and max (exclusive)
+ * Generate a random integer in the range [min, max)
  * @param {Number} max - The upper limit (exclusive)
  * @param {Number} min - The lower limit, defaults to 0 if not specified (inclusive)
- * @returns {Number} A number between 0 and max
+ * @returns {Number} A number between min and max
  */
 module.exports.randint = function(max, min) {
 	if (arguments.length < 2) { min = 0; }

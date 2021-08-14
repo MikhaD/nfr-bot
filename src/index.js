@@ -92,8 +92,7 @@ client.on("messageCreate", async (msg) => {
 
 		//i try to execute command
 		try {
-			// msg.channel.startTyping();
-			// msg.channel.sendTyping();
+			msg.channel.sendTyping();
 			await command.execute(msg, args);
 		} catch (e) {
 			console.log(e);
@@ -102,22 +101,22 @@ client.on("messageCreate", async (msg) => {
 	} else {
 		msg.client.commands.get("help").execute(msg, [cmd]);
 	}
-	// msg.channel.stopTyping();
 });
 
 client.on("interactionCreate", async interaction => {
 	//i Check its from a slash command as things like buttons and drop downs also create these events
-	if (!interaction.isCommand()) { return; }
-	try {
-		const command = client.slashCommands.get(interaction.commandName);
-		if (command) {
-			await interaction.defer(); // by deferring we have 15m to respond, but cannot use reply on the interaction, only followUp and editReply
-			await command.execute(interaction);
+	if (interaction.isCommand()) {
+		try {
+			const command = client.slashCommands.get(interaction.commandName);
+			if (command) {
+				await interaction.deferReply(); // by deferring we have 15m to respond, but cannot use reply on the interaction, only followUp and editReply
+				await command.execute(interaction);
+			}
+		} catch (e) {
+			console.log(e);
+			const err = createErrorEmbed("Failed to execute command", e);
+			await interaction.followUp({ embeds: [err], ephemeral: true });
 		}
-	} catch (e) {
-		console.log(e);
-		const err = createErrorEmbed("Failed to execute command", e);
-		await interaction.followUp({ embeds: [err], ephemeral: true });
 	}
 });
 
