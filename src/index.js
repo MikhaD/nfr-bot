@@ -108,7 +108,7 @@ client.on("interactionCreate", async interaction => {
 		try {
 			const command = client.slashCommands.get(interaction.commandName);
 			if (command) {
-				//! Discord API currently doesn't allow setting of permissions for discord perms for slash commands, only roles. This means the commands will be visible to people who can't use them
+				//! Discord API currently doesn't allow setting of permissions for discord perms for slash commands, only roles. This means the commands will be visible to people who can't use them https://github.com/discord/discord-api-docs/discussions/3581
 				if (command.perms) {
 					const authorPerms = interaction.channel.permissionsFor(interaction.member);
 					if (!authorPerms || !authorPerms.has(command.perms)) {

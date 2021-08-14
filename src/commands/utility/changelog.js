@@ -38,16 +38,3 @@ module.exports = {
 		msg.channel.send({embeds: [changelog]});
 	}
 };
-
-let s = function(a, b) {
-	const result = [0, 0];
-	const input = [a, b];
-	for (let i = 0; i < input.length; ++i) {
-		input[i] = input[i].slice(0, -4).split(".").map(j => parseInt(j));
-		while (input[i].length < 3) { input[i].push(0); }
-		for (let k = 0; k < input[i].length; ++k) {
-			result[i] += input[i][k] * 10 ** (input[i].length - (k + 1));
-		}
-	}
-	return result[1] - result[0];
-};
