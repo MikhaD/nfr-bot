@@ -8,10 +8,10 @@
 	"dev_cmd_file_prefix": "$",
 	"colors": {
 		"embed": {
-			"default": "#980F91",
-			"error": "#FF5555",
-			"warn": "#FE9713",
-			"success": "#24A400"
+			"default": "#992699",
+			"error": "#992626",
+			"warn": "#995026",
+			"success": "#399926"
 		},
 		"tag": {
 			"null": "#C4AB79",
