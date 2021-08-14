@@ -57,8 +57,7 @@ client.on("messageCreate", async (msg) => {
 		}
 		//i check if user has permission to use that command
 		if (command.permissions) {
-			let needsDev = false;
-			if (command.permissions.includes("DEV") && msg.author.id !== config.developer_id) { needsDev = true; }
+			const needsDev = (command.permissions.includes("DEV") && msg.author.id !== config.developer_id);
 
 			const authorPerms = msg.channel.permissionsFor(msg.author);
 			if (!authorPerms || !authorPerms.has(command.permissions) || needsDev) {
@@ -109,7 +108,19 @@ client.on("interactionCreate", async interaction => {
 		try {
 			const command = client.slashCommands.get(interaction.commandName);
 			if (command) {
-				await interaction.deferReply(); // by deferring we have 15m to respond, but cannot use reply on the interaction, only followUp and editReply
+				//! Discord API currently doesn't allow setting of permissions for discord perms for slash commands, only roles. This means the commands will be visible to people who can't use them
+				if (command.perms) {
+					const authorPerms = interaction.channel.permissionsFor(interaction.member);
+					if (!authorPerms || !authorPerms.has(command.perms)) {
+						return interaction.reply({content: `⛔ ${parsePermissions(command.perms)} is required to use this command`, ephemeral: true});
+					}
+				}
+
+				if (interaction.options.getBoolean("ephemeral")) {
+					await interaction.deferReply({ ephemeral: true });
+				} else {
+					await interaction.deferReply(); // by deferring we have 15m to respond, but cannot use reply on the interaction, only followUp and editReply
+				}
 				await command.execute(interaction);
 			}
 		} catch (e) {
