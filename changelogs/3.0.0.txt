@@ -1,36 +1,9 @@
-*23/07/2021*
-- Changed highlight color of changelog embed to default color
-- Changed stats command second paramter from plaintext to formatted. It now needs to be true instead of false to show formatted
-*24/07/2021*
-- Made multi word arguments into single words with underscores min days -> min_days
-- Removed commas sperating optional parameters in command help as they were misleading
-- Made command parameters a different font in help commands
-- Specified that <> is a required parameter and [] are optional parameters in the base help command
-*25/07/2021*
-- Changed cooldown to only be shown in help commands if it is greater than zero
-- Updated command template to include a dev boolean
-- Modified help command to exclude dev commands from the help list
-- Created new reload dev command
-- Fixed \help for an unknown command saying \undefined is not a valid command
-- Added createSuccessEmbed to utility and replaced instances of success embeds being made from scratch with this command
-*28/07/2021*
+
 - Made absences command faster by generating banner image and fetching player data in parallel
-*29/07/2021*
-- Added abs as an alias for absences because people can't spell
-*30/07/2021*
-- Updated to discord.js version 13 (dev release)
-- Fixed embeds for v13
-*04/08/2021*
+- Updated to discord.js v13
 - Modified command handler to accept slash commands
-- Modified reload command to work with slash commands (but not for the execute parameter yet)
-- Added channel partial to enable recieving of dms in v13
-- Added a flip slash command
-- Added new custom permission DEV that only accepts me
-*05/08/2021*
 - Fixed crash error if fetchPlayerFace returns null in stats command
-- Created prefix: guild name reference map
-*06/08/2021*
-- Updated to discord.js version 13 full release
 - Changed to semver versioning system instead of my own bespoke system
-- Added repository, keywords and private keys to package.json
-- Moved all items from to do.md to notion board and deleted it
+- Converted all commands to slash commands
+
+- A bunch of other changes, see [github](https://github.com/MikhaD/nfr-bot) for details
