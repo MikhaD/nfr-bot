@@ -116,7 +116,7 @@ client.on("interactionCreate", async interaction => {
 					}
 				}
 
-				if (interaction.options.getBoolean("ephemeral")) {
+				if (interaction.options.getBoolean("ephemeral") || command.ephemeral) {
 					await interaction.deferReply({ ephemeral: true });
 				} else {
 					await interaction.deferReply(); // by deferring we have 15m to respond, but cannot use reply on the interaction, only followUp and editReply

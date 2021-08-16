@@ -1,6 +1,7 @@
 module.exports = {
 	name: "",
 	description: "",
+	ephemeral: false,
 	options: [{
 		name: "example",
 		type: "STRING",
