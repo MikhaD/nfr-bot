@@ -10,7 +10,7 @@ module.exports = {
 		description: "A list of space seperated options. Strings in inverted commas count as one option",
 		required: true
 	}],
-	execute(interaction) {
+	async execute(interaction) {
 		//i ######## combine groups of args that start and end in inverted commas into single args #######
 		let comma = "";
 		let args = [];
@@ -41,6 +41,6 @@ module.exports = {
 		if (str !== "") args.push(str);
 
 		//i ############################# choose and return a random argument ############################
-		return interaction.followUp(`${args[[randint(args.length)]]}`);
+		await interaction.followUp(`${args[[randint(args.length)]]}`);
 	}
 };

@@ -11,8 +11,9 @@ module.exports = {
 		description: "The number of sides on the die",
 		required: false
 	}],
-	execute(interaction) {
+
+	async execute(interaction) {
 		const sides = interaction.options.getInteger("sides");
-		interaction.followUp(`${randint(sides ? sides : config.defualt_dice) + 1}`);
+		await interaction.followUp(`${randint(sides ? sides : config.defualt_dice) + 1}`);
 	}
 };
