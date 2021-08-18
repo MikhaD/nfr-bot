@@ -19,6 +19,7 @@ for (const dir of readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.
 	//match files that end in .js and don't start with _
 	for (const file of readdirSync(`${__dirname}/commands/${dir}`).filter(file => /^[^_].*\.js$/.test(file))) {
 		const command = require(`./commands/${dir}/${file}`);
+		command.category = dir;
 		client.commands.set(command.name, command);
 	}
 }
@@ -28,6 +29,7 @@ client.slashCommands = new Discord.Collection();
 for (const dir of readdirSync(`${__dirname}/slashCommands`).filter(dir => /^[^_].*$/.test(dir))) {
 	for (const file of readdirSync(`${__dirname}/slashCommands/${dir}`).filter(file => /^[^_].*\.js$/.test(file))) {
 		const command = require(`./slashCommands/${dir}/${file}`);
+		command.category = dir;
 		client.slashCommands.set(command.name, command);
 	}
 }
