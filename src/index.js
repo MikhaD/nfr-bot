@@ -37,7 +37,7 @@ client.once("ready", async () => {
 	client.user.setActivity(`${config.prefix}help`, { type: "PLAYING" });
 	//! Register slash commands globally for release version
 	// client.appCmdManager = client.application.commands;
-	client.appCmdManager = client.guilds.cache.get("843909132359958618").commands;
+	client.appCmdManager = client.guilds.cache.get(config.dev_guild_id).commands;
 	await client.appCmdManager.set(Array.from(client.slashCommands, el => el[1]));
 
 	console.log(`${client.user.tag} has logged in.`);

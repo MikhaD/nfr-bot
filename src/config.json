@@ -5,6 +5,7 @@
 	"default_guild": "Nefarious Ravens",
 	"min_days": 7,
 	"defualt_dice": 6,
+	"dev_guild_id": "843909132359958618",
 	"dev_cmd_file_prefix": "$",
 	"colors": {
 		"embed": {

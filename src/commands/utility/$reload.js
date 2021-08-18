@@ -14,12 +14,15 @@ module.exports = {
 	dev: true,
 
 	async execute(msg, args) {
-		const { commands } = msg.client;
 		let slash = false;
+		let commands;
 		let commandName = args[0].toLowerCase();
 		if (commandName.startsWith("/")) {
 			commandName = commandName.slice(1);
+			commands = msg.client.slashCommands;
 			slash = true;
+		} else {
+			commands = msg.client.commands;
 		}
 		const command = commands.get(commandName) || commands.find(i => i.aliases && i.aliases.includes(commandName));
 
@@ -40,6 +43,7 @@ module.exports = {
 					for (const i of msg.client.appCmdManager.cache) {
 						if (i[1].name === commandName) {
 							await msg.client.appCmdManager.edit(i[0], newCommand);
+							msg.client.slashCommands.set(command.name, newCommand);
 							succeeded = true;
 							break;
 						}
