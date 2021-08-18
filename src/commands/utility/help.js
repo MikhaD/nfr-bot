@@ -14,7 +14,7 @@ module.exports = {
 	example: "help absences",
 	cooldown: 2,
 
-	execute(msg, args) {
+	async execute(msg, args) {
 		const { commands } = msg.client;
 		if (args.length) {
 			const command = commands.get(args[0].toLowerCase()) || commands.find(i => i.aliases && i.aliases.includes(args[0].toLowerCase()));
@@ -47,7 +47,10 @@ module.exports = {
 				if ((command.cooldown && command.cooldown > 0) || config.default_cooldown > 0) {
 					helpEmbed.addField("Cooldown:", `${(command.cooldown) ? command.cooldown : config.default_cooldown} seconds`);
 				}
-				msg.channel.send({embeds: [helpEmbed]});
+				//i Category
+				helpEmbed.setFooter(`Category: ${command.category}`);
+
+				await msg.channel.send({embeds: [helpEmbed]});
 			} else {
 				msg.channel.send({embeds: [createErrorEmbed(
 					`${config.prefix}${args[0].toLowerCase()} is not a valid command`,
