@@ -1,4 +1,5 @@
 const { MessageEmbed, Collection } = require("discord.js");
+const config = require("../config.json");
 
 module.exports = class Embed extends MessageEmbed {
 	constructor(title, description) {
@@ -8,6 +9,7 @@ module.exports = class Embed extends MessageEmbed {
 		this.pageNames = [];
 		this.setTitle(`${title}`);
 		this.setDescription(`${description}`);
+		this.setColor(config.colors.embed.default);
 	}
 
 	/**
