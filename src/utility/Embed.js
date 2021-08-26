@@ -9,13 +9,14 @@ module.exports = class Embed extends MessageEmbed {
 	 */
 	constructor(title, description) {
 		super();
-
+		this.internalPages = [this];
 		this.pages = new Collection();
 		this.currentPage = 0;
+		this.fieldCount = 0;
 		this.nextButton = false;
-		this.setReturnToInitialPage(true);
 		this.buttonsTimeout = 300000;
 		this.pageNames = [];
+		this.setReturnToInitialPage(true);
 		this.setTitle(`${title}`);
 		this.setDescription(`${description}`);
 		this.setColor(config.colors.embed.default);
@@ -55,8 +56,26 @@ module.exports = class Embed extends MessageEmbed {
 		}
 	}
 
+	/**
+	 * Set the number of seconds for the embeds navigation buttons to persist for
+	 * @param {Integer} seconds The number of seconds before the message navigation buttons dissapear
+	 */
 	setButtonsTimeout(seconds) {
 		this.buttonsTimeout = seconds * 1000;
+	}
+
+	addField(title, text, inline) {
+		++this.fieldCount;
+		if (this.fieldCount > 1 && this.fieldCount % 25 === 1) {
+			const emb = new Embed("", "").setColor(this.color);
+			this.internalPages.push(emb);
+			this.addPage(`initial${Math.floor(this.fieldCount / 25)}`, emb);
+		}
+		if (this.fieldCount > 25) {
+			this.internalPages.slice(-1)[0].addField(title, text, inline);
+		} else {
+			super.addField(title, text, inline);
+		}
 	}
 
 	/**
@@ -98,7 +117,7 @@ module.exports = class Embed extends MessageEmbed {
 	setMessageObject(message) {
 		let firstInteraction = true;
 
-		const collector = message.channel.createMessageComponentCollector({ componentType: "BUTTON", time: 10000, message });
+		const collector = message.channel.createMessageComponentCollector({ componentType: "BUTTON", time: 60000, message });
 		collector.on("collect", async (btnInteraction) => {
 			btnInteraction.deferUpdate();
 			if (this.nextButton) {
@@ -118,7 +137,7 @@ module.exports = class Embed extends MessageEmbed {
 			}
 		});
 
-		collector.on("end", async (btnInteraction) => {
+		collector.on("end", async () => {
 			await message.edit({ components: [] });
 		});
 	}
