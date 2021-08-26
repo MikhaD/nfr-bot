@@ -15,7 +15,7 @@ module.exports = {
 	permissions: ["ADMINISTRATOR"],
 
 	async execute(msg, args) {
-		//i ######################################## Process arguments #######################################
+		//info ###################################### Process arguments ######################################
 		let guildName = config.default_guild;
 		if (args.length > 0) {
 			guildName = "";
@@ -28,27 +28,29 @@ module.exports = {
 		guildName = guildName.trim();
 		const period = parseInt((args.length === 0) ? config.min_days : args[0]);
 
-		//i #################################### Fetch absent players data ###################################
+		//info ################################## Fetch absent players data ##################################
 		const guild = await fetchGuild(guildName);
 		if (guild.error) {
 			if (guild.error === "Guild not found") {
-				msg.channel.send({embeds: [createErrorEmbed(
-					`Failed to retrieve data for ${guildName}`,
-					"**Note:** Guild names are case sensitive. You also need to use the full name, not just the prefix (Nefarious Ravens not NFR)"
-				)]});
+				msg.channel.send({
+					embeds: [createErrorEmbed(
+						`Failed to retrieve data for ${guildName}`,
+						"**Note:** Guild names are case sensitive. You also need to use the full name, not just the prefix (Nefarious Ravens not NFR)"
+					)]
+				});
 			} else {
-				msg.channel.send({embeds: [createErrorEmbed(`Failed to retrieve data for ${guildName}`, guild.error)]});
+				msg.channel.send({ embeds: [createErrorEmbed(`Failed to retrieve data for ${guildName}`, guild.error)] });
 			}
 			return;
 		}
-		//i Start fetching player data
+		//info Start fetching player data
 		const AbsenteeData = getAbsenteeData(guild.members);
 		const message = {};
 		const embed = new MessageEmbed()
 			.setTitle(`${guildName} Absences:`)
 			.setColor(config.colors.embed.default);
 
-		//i Generate guild banner and attach it as thumbnail if guild has a banner
+		//info Generate guild banner and attach it as thumbnail if guild has a banner
 		if (guild.banner) {
 			const attachmentName = "rankImage.png";
 			const attachment = new MessageAttachment(await createBannerImage(guild.banner), attachmentName);
@@ -58,7 +60,7 @@ module.exports = {
 		// once player data has been fetched
 		AbsenteeData.then(data => {
 			let absentees = 0;
-			//i Sort absences by time absent
+			//info Sort absences by time absent
 			data.absences = new Map([...data.absences.entries()].sort((a, b) => b[1] - a[1]));
 			for (const i of data.absences) {
 				if (i[1] >= period) {
@@ -117,6 +119,6 @@ function daysSince(timeString) {
 	}
 	const milliseconds =
 		new Date() - new Date(time[0], time[1] - 1, time[2], time[3], time[4], time[5], time[6]);
-	//i 84 400 000 milliseconds per day
+	//info 84 400 000 milliseconds per day
 	return Math.floor(milliseconds / 86400000);
 }

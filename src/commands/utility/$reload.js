@@ -27,7 +27,7 @@ module.exports = {
 		const command = commands.get(commandName) || commands.find(i => i.aliases && i.aliases.includes(commandName));
 
 		if (command) {
-			//i Find the path of the command and delete the require cache
+			//info Find the path of the command and delete the require cache
 			const commandFileName = `${(command.dev) ? config.dev_cmd_file_prefix : ""}${command.name}.js`;
 			const commandsDir = path.join(__dirname, `../../${slash ? "slashCommands" : "commands"}`);
 			const commandDirs = fs.readdirSync(commandsDir);
@@ -37,7 +37,7 @@ module.exports = {
 
 			try {
 				const newCommand = require(`${commandsDir}/${dirName}/${commandFileName}`);
-				//i Reload if the command is a slash command
+				//info Reload if the command is a slash command
 				if (slash) {
 					let succeeded = false;
 					for (const i of msg.client.appCmdManager.cache) {
@@ -52,16 +52,18 @@ module.exports = {
 						throw new Error(`could not get command ID for ${commandName}`);
 					}
 				} else {
-					//i Reload if the command is not a slash command
+					//info Reload if the command is not a slash command
 					msg.client.commands.set(command.name, newCommand);
 				}
-				msg.channel.send({embeds: [createSuccessEmbed(`${slash ? "/" : config.prefix}${command.name} sucessfully reloaded.`, "")]});
+				msg.channel.send({ embeds: [createSuccessEmbed(`${slash ? "/" : config.prefix}${command.name} sucessfully reloaded.`, "")] });
 			} catch (e) {
 				console.error(e);
-				msg.channel.send({embeds: [createErrorEmbed(
-					`Failed to reload ${slash ? "/" : config.prefix}${command.name}`,
-					e.message
-				)]});
+				msg.channel.send({
+					embeds: [createErrorEmbed(
+						`Failed to reload ${slash ? "/" : config.prefix}${command.name}`,
+						e.message
+					)]
+				});
 			}
 		} else {
 			msg.client.commands.get("help").execute(msg, [commandName]);

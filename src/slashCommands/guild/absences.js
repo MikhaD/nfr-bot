@@ -22,31 +22,33 @@ module.exports = {
 	}],
 
 	async execute(interaction) {
-		//i ######################################## Process arguments #######################################
+		//info ###################################### Process arguments ######################################
 		let guildName = interaction.options.getString("guild") || config.default_guild;
 		guildName = guildName.trim();
 		const days = interaction.options.getInteger("days") || config.min_days;
 
-		//i #################################### Fetch absent players data ###################################
+		//info ################################## Fetch absent players data ##################################
 		const guild = await fetchGuild(guildName);
 		if (guild.error) {
 			if (guild.error === "Guild not found") {
-				return await interaction.followUp({embeds: [createErrorEmbed(
-					`Failed to retrieve data for ${guildName}`,
-					"**Note:** Guild names are case sensitive. You also need to use the full name, not just the prefix (Nefarious Ravens not NFR)"
-				)]});
+				return await interaction.followUp({
+					embeds: [createErrorEmbed(
+						`Failed to retrieve data for ${guildName}`,
+						"**Note:** Guild names are case sensitive. You also need to use the full name, not just the prefix (Nefarious Ravens not NFR)"
+					)]
+				});
 			}
-			return await interaction.followUp({embeds: [createErrorEmbed(`Failed to retrieve data for ${guildName}`, guild.error)]});
+			return await interaction.followUp({ embeds: [createErrorEmbed(`Failed to retrieve data for ${guildName}`, guild.error)] });
 		}
-		//i Start fetching player data
+		//info Start fetching player data
 		let AbsenteeData = getAbsenteeData(guild.members);
 		const embed = new Embed(`${guildName} Absences:`, "");
 
-		//i Start generating guild banner if guild has a banner
+		//info Start generating guild banner if guild has a banner
 		let banner = createBannerImage(guild.banner);
 
 		AbsenteeData = await AbsenteeData;
-		//i Add banner image to embed if guild has banner
+		//info Add banner image to embed if guild has banner
 		const message = embed.getMessageOptionsObject(true, true);
 		banner = await banner;
 		if (banner) {
@@ -58,7 +60,7 @@ module.exports = {
 
 		let absentees = 0;
 		let absenteeNames = "";
-		//i Sort absences by time absent
+		//info Sort absences by time absent
 		AbsenteeData.absences = new Map([...AbsenteeData.absences.entries()].sort((a, b) => b[1] - a[1]));
 		for (const i of AbsenteeData.absences) {
 			if (i[1] >= days) {
@@ -138,6 +140,6 @@ function daysSince(timeString) {
 	}
 	const milliseconds =
 		new Date() - new Date(time[0], time[1] - 1, time[2], time[3], time[4], time[5], time[6]);
-	//i 84 400 000 milliseconds per day
+	//info 84 400 000 milliseconds per day
 	return Math.floor(milliseconds / 86400000);
 }

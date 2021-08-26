@@ -45,7 +45,7 @@ async function recolor(color, rank) {
 }
 
 (async () => {
-	//i Change this variable to change the color scheme
+	//info Change this variable to change the color scheme
 	const color = wynndataColor;
 	for (const i in color) {
 		await recolor(color[i], i);

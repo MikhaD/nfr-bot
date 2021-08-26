@@ -20,7 +20,7 @@ module.exports = {
 			const command = commands.get(args[0].toLowerCase()) || commands.find(i => i.aliases && i.aliases.includes(args[0].toLowerCase()));
 			if (command) {
 				const helpEmbed = new MessageEmbed();
-				//i Developer command
+				//info Developer command
 				if (command.dev) {
 					helpEmbed.setTitle("❗ Developer Command ❗");
 					helpEmbed.setDescription("**Please only use if you know what you are doing.**");
@@ -31,9 +31,9 @@ module.exports = {
 					helpEmbed.setDescription(command.description);
 					helpEmbed.setColor(config.colors.embed.default);
 				}
-				//i Example
+				//info Example
 				if (command.example) helpEmbed.addField("Example:", `${config.prefix}${command.example}`);
-				//i Aliases
+				//info Aliases
 				if (command.aliases) {
 					let aliasString = "";
 					for (const alias of command.aliases) {
@@ -41,21 +41,23 @@ module.exports = {
 					}
 					helpEmbed.addField("Aliases:", aliasString.slice(0, -2));
 				}
-				//i Permissions
+				//info Permissions
 				if (command.permissions) helpEmbed.addField("Permissions:", parsePermissions(command.permissions));
-				//i Cooldown
+				//info Cooldown
 				if ((command.cooldown && command.cooldown > 0) || config.default_cooldown > 0) {
 					helpEmbed.addField("Cooldown:", `${(command.cooldown) ? command.cooldown : config.default_cooldown} seconds`);
 				}
-				//i Category
+				//info Category
 				helpEmbed.setFooter(`Category: ${command.category}`);
 
-				await msg.channel.send({embeds: [helpEmbed]});
+				await msg.channel.send({ embeds: [helpEmbed] });
 			} else {
-				msg.channel.send({embeds: [createErrorEmbed(
-					`${config.prefix}${args[0].toLowerCase()} is not a valid command`,
-					`Type \`${config.prefix}${this.name}\` to see the list of commands.`
-				)]});
+				msg.channel.send({
+					embeds: [createErrorEmbed(
+						`${config.prefix}${args[0].toLowerCase()} is not a valid command`,
+						`Type \`${config.prefix}${this.name}\` to see the list of commands.`
+					)]
+				});
 			}
 		} else {
 			const helpEmbed = createStandardEmbed(
@@ -68,7 +70,7 @@ module.exports = {
 				}
 			}
 			helpEmbed.setFooter(`Page 1 of ${Math.ceil(commands.size / 25)}`);
-			msg.channel.send({embeds: [helpEmbed]});
+			msg.channel.send({ embeds: [helpEmbed] });
 		}
 	},
 };
