@@ -39,6 +39,8 @@ module.exports = class Embed extends MessageEmbed {
 	addPage(name, embed) {
 		this.pageNames.push(name);
 		this.pages.set(name, embed);
+		if (this.thumbnail) embed.setThumbnail(this.thumbnail.url);
+		embed.setColor(this.color);
 	}
 
 	/**
@@ -65,13 +67,15 @@ module.exports = class Embed extends MessageEmbed {
 	}
 
 	addField(title, text, inline) {
+		const maxPages = 25;
 		++this.fieldCount;
-		if (this.fieldCount > 1 && this.fieldCount % 25 === 1) {
+		if (this.fieldCount > 1 && this.fieldCount % maxPages === 1) {
 			const emb = new Embed("", "").setColor(this.color);
+			if (this.thumbnail) emb.setThumbnail(this.thumbnail.url);
 			this.internalPages.push(emb);
-			this.addPage(`initial${Math.floor(this.fieldCount / 25)}`, emb);
+			this.addPage(`initial${Math.floor(this.fieldCount / maxPages)}`, emb);
 		}
-		if (this.fieldCount > 25) {
+		if (this.fieldCount > maxPages) {
 			this.internalPages.slice(-1)[0].addField(title, text, inline);
 		} else {
 			super.addField(title, text, inline);
@@ -117,7 +121,7 @@ module.exports = class Embed extends MessageEmbed {
 	setMessageObject(message) {
 		let firstInteraction = true;
 
-		const collector = message.channel.createMessageComponentCollector({ componentType: "BUTTON", time: 60000, message });
+		const collector = message.channel.createMessageComponentCollector({ componentType: "BUTTON", time: this.buttonsTimeout, message });
 		collector.on("collect", async (btnInteraction) => {
 			btnInteraction.deferUpdate();
 			if (this.nextButton) {

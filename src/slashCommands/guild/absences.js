@@ -1,5 +1,6 @@
 const path = require("path");
 const { MessageAttachment, Util, MessageEmbed } = require("discord.js");
+const Embed = require("../../utility/Embed");
 const config = require(path.join(__dirname, "../../config.json"));
 const { createErrorEmbed, fetchPlayer, fetchGuild, createBannerImage } = require(path.join(__dirname, "../../utility/utility"));
 
@@ -38,39 +39,58 @@ module.exports = {
 			return await interaction.followUp({embeds: [createErrorEmbed(`Failed to retrieve data for ${guildName}`, guild.error)]});
 		}
 		//i Start fetching player data
-		const AbsenteeData = getAbsenteeData(guild.members);
-		const message = {};
-		const embed = new MessageEmbed()
-			.setTitle(`${guildName} Absences:`)
-			.setColor(config.colors.embed.default);
+		let AbsenteeData = getAbsenteeData(guild.members);
+		const embed = new Embed(`${guildName} Absences:`, "");
 
-		//i Generate guild banner and attach it as thumbnail if guild has a banner
-		if (guild.banner) {
-			const attachmentName = "rankImage.png";
-			const attachment = new MessageAttachment(await createBannerImage(guild.banner), attachmentName);
+		//i Start generating guild banner if guild has a banner
+		let banner = createBannerImage(guild.banner);
+
+		AbsenteeData = await AbsenteeData;
+		//i Add banner image to embed if guild has banner
+		const message = embed.getMessageOptionsObject(true, true);
+		banner = await banner;
+		if (banner) {
+			const attachmentName = "banner.png";
+			const attachment = new MessageAttachment(banner, attachmentName);
 			message.files = [attachment];
 			embed.setThumbnail(`attachment://${attachmentName}`);
 		}
-		// once player data has been fetched
-		AbsenteeData.then(async data => {
-			let absentees = 0;
-			//i Sort absences by time absent
-			data.absences = new Map([...data.absences.entries()].sort((a, b) => b[1] - a[1]));
-			for (const i of data.absences) {
-				if (i[1] >= days) {
-					++absentees;
-					embed.addField(Util.escapeItalic(i[0]), `${i[1]} days`);
-				}
-			}
-			embed.setDescription(`The following ${absentees} people have been absent for ${days}+ days`);
 
-			//! Failed players should have clock reaction to return to absences (if more than ~5 have failed it is likely the api has been pinged too many times)
-			embed.setFooter(
-				`${(Math.ceil(absentees / 25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(data.failed.length) ? ", ❗Show failed" : ""}
-				\npage 1 of ${Math.ceil(absentees / 25)}`);
-			message.embeds = [embed];
-			await interaction.followUp(message);
-		});
+		let absentees = 0;
+		let absenteeNames = "";
+		//i Sort absences by time absent
+		AbsenteeData.absences = new Map([...AbsenteeData.absences.entries()].sort((a, b) => b[1] - a[1]));
+		for (const i of AbsenteeData.absences) {
+			if (i[1] >= days) {
+				++absentees;
+				embed.addField(Util.escapeItalic(i[0]), `${i[1]} days`);
+				absenteeNames += `${Util.escapeItalic(i[0])}\n`;
+			}
+		}
+		embed.addPage("Hide Times", new Embed(
+			`${guildName} Absences:`,
+			`The following ${absentees} people have been absent for ${days}+ days. Duration absent hidden for easy copying.\n\n**${absenteeNames}**`
+		));
+		embed.setDescription(`The following ${absentees} people have been absent for ${days}+ days`);
+
+		if (AbsenteeData.failed.length) {
+			const failedEmbed = new Embed(
+				"Failed:",
+				"Failed to fetch data for the following players. This is likely due to these players changing their names while in the guild."
+			);
+			embed.addPage("Failed", failedEmbed);
+			failedEmbed.setColor(config.colors.embed.error);
+			for (const i of AbsenteeData.failed) {
+				failedEmbed.addField("\u200b", `[**${Util.escapeItalic(i)}**](https://namemc.com/search?q=${i} "See name history")`);
+			}
+		}
+		//! Failed players should have clock reaction to return to absences (if more than ~5 have failed it is likely the api has been pinged too many times)
+		embed.setFooter(
+			`${(Math.ceil(absentees / 25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(AbsenteeData.failed.length) ? ", ❗Show failed" : ""}
+			\npage 1 of ${Math.ceil(absentees / 25)}`);
+
+		const msg = await interaction.followUp(message);
+		embed.setMessageObject(msg);
 	}
 };
 
