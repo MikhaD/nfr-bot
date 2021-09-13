@@ -2,7 +2,7 @@
 ![](https://raw.githubusercontent.com/MikhaD/nfr-bot/main/src/images/nfr-bot.png)
 
 <a href="https://discord.gg/55XKx6mPuK">
-	<img alt="Discord" src="https://img.shields.io/discord/739428526431666237?label=Discord&logo=discord&logoColor=ffffff&color=5865F2">
+	<img alt="Discord" src="https://img.shields.io/discord/739428526431666237?label=Nefarious%20Ravens&logo=discord&logoColor=ffffff&color=5865F2">
 </a>
 
 *(other github workflow integrations here for version, tests etc)*
