@@ -1,9 +1,0 @@
-
-- Made absences command faster by generating banner image and fetching player data in parallel
-- Updated to discord.js v13
-- Modified command handler to accept slash commands
-- Fixed crash error if fetchPlayerFace returns null in stats command
-- Changed to semver versioning system instead of my own bespoke system
-- Converted all commands to slash commands
-
-- A bunch of other changes, see [github](https://github.com/MikhaD/nfr-bot) for details

@@ -1,7 +1,0 @@
-*22/07/2021*
-- Added guild banner image to absences command
-- Added stats command
-- Added changelog command
-- Escaped italics in player names
-- Made some things prettier
-- Added status

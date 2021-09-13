@@ -1,12 +1,12 @@
 const path = require("path");
 const config = require(path.join(__dirname, "../../config.json"));
-const { randint } = require(path.join(__dirname, "../../utility/utility"));
+const { randint } = require(path.join(__dirname, "../../utility/_utility"));
 
 module.exports = {
 	name: "roll",
 	aliases: ["d", "dice"],
 	args: {
-		optional: ["dice_sides"]
+		optional: ["dice sides"]
 	},
 	description: "Roll a dice with x number of sides",
 	example: "roll 20",

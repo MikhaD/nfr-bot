@@ -1,15 +1,14 @@
 const path = require("path");
-const { MessageAttachment, Util, MessageEmbed } = require("discord.js");
+const { MessageAttachment, Util } = require("discord.js");
 const config = require(path.join(__dirname, "../../config.json"));
-const { createErrorEmbed, fetchPlayer, fetchGuild, createBannerImage } = require(path.join(__dirname, "../../utility/utility"));
+const { createErrorEmbed, fetchPlayer, fetchGuild, createSimpleEmbed, createBannerImage } = require(path.join(__dirname, "../../utility/_utility"));
 
 module.exports = {
 	name: "absences",
-	aliases: ["abs"],
 	args: {
-		optional: ["guild", "min_days"]
+		optional: ["guild", "min days"]
 	},
-	description: "List players from a guild who have been absent for `min_days` number of days, Nefarious Ravens and 7 days by default.",
+	description: "List players from a guild who have been absent for <min days> number of days, Nefarious Ravens and 7 days by default.",
 	example: "absences Nefarious Ravens 15",
 	cooldown: 30,
 	permissions: ["ADMINISTRATOR"],
@@ -32,49 +31,43 @@ module.exports = {
 		const guild = await fetchGuild(guildName);
 		if (guild.error) {
 			if (guild.error === "Guild not found") {
-				msg.channel.send({embeds: [createErrorEmbed(
+				msg.channel.send(createErrorEmbed(
 					`Failed to retrieve data for ${guildName}`,
-					"**Note:** Guild names are case sensitive. You also need to use the full name, not just the prefix (Nefarious Ravens not NFR)"
-				)]});
+					"**Note:** Guild names are case sensitive. You also need to use the full name, not just the prefix (Nefarious Ravens not NFR)"));
 			} else {
-				msg.channel.send({embeds: [createErrorEmbed(`Failed to retrieve data for ${guildName}`, guild.error)]});
+				msg.channel.send(`Failed to retrieve data for ${guildName}`, guild.error);
 			}
 			return;
 		}
-		//i Start fetching player data
-		const AbsenteeData = getAbsenteeData(guild.members);
-		const message = {};
-		const embed = new MessageEmbed()
-			.setTitle(`${guildName} Absences:`)
-			.setColor(config.colors.embed.default);
 
-		//i Generate guild banner and attach it as thumbnail if guild has a banner
+		const AbsenteeData = await getAbsenteeData(guild.members);
+
+		//i ########################################## Create embed ##########################################
+		const embed = createSimpleEmbed(`${guildName} Absences:`);
+
 		if (guild.banner) {
 			const attachmentName = "rankImage.png";
 			const attachment = new MessageAttachment(await createBannerImage(guild.banner), attachmentName);
-			message.files = [attachment];
+			embed.attachFiles([attachment]);
 			embed.setThumbnail(`attachment://${attachmentName}`);
 		}
-		// once player data has been fetched
-		AbsenteeData.then(data => {
-			let absentees = 0;
-			//i Sort absences by time absent
-			data.absences = new Map([...data.absences.entries()].sort((a, b) => b[1] - a[1]));
-			for (const i of data.absences) {
-				if (i[1] >= period) {
-					++absentees;
-					embed.addField(Util.escapeItalic(i[0]), `${i[1]} days`);
-				}
-			}
-			embed.setDescription(`The following ${absentees} people have been absent for ${period}+ days`);
 
-			//! Failed players should have clock reaction to return to absences (if more than ~5 have failed it is likely the api has been pinged too many times)
-			embed.setFooter(
-				`${(Math.ceil(absentees / 25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(data.failed.length) ? ", ❗Show failed" : ""}
-				\npage 1 of ${Math.ceil(absentees / 25)}`);
-			message.embeds = [embed];
-			msg.channel.send(message);
-		});
+		let absentees = 0;
+		//i Sort absences by time absent
+		AbsenteeData.absences = new Map([...AbsenteeData.absences.entries()].sort((a, b) => b[1] - a[1]));
+		for (const i of AbsenteeData.absences) {
+			if (i[1] >= period) {
+				++absentees;
+				embed.addField(Util.escapeItalic(i[0]), `${i[1]} days`);
+			}
+		}
+		embed.setDescription(`The following ${absentees} people have been absent for ${period}+ days`);
+
+		//! Failed players should have clock reaction to return to absences (if more than ~5 have failed it is likely the api has been pinged too many times)
+		embed.setFooter(
+			`${(Math.ceil(absentees / 25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(AbsenteeData.failed.length) ? ", ❗Show failed" : ""}
+			\npage 1 of ${Math.ceil(absentees / 25)}`);
+		msg.channel.send(embed);
 	}
 };
 
@@ -85,6 +78,12 @@ module.exports = {
  * pairs of playerName: days absent, and failed containing a list of players who's data failed to get retrieved
  */
 async function getAbsenteeData(members) {
+	// check if guild is in database and when it was put there
+	// get guild info from api
+	// get all the player names
+	// query each player name & check last login
+	// store info for this guild in database
+
 	const promiseArray = [];
 	let failed = 0;
 	for (const member of members) {
