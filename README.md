@@ -1,7 +1,11 @@
 
 ![](https://raw.githubusercontent.com/MikhaD/nfr-bot/main/src/images/nfr-bot.png)
 
-*(github workflow integrations here for version, tests etc)*
+<a href="https://discord.gg/55XKx6mPuK">
+	<img alt="Discord" src="https://img.shields.io/discord/739428526431666237?label=Discord&logo=discord&logoColor=ffffff&color=5865F2">
+</a>
+
+*(other github workflow integrations here for version, tests etc)*
 
 A utility discord bot for displaying information from the Wynncraft API, written in Javascript using [discord.js](https://github.com/discordjs/discord.js)
 
