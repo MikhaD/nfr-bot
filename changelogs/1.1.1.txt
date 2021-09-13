@@ -1,4 +1,0 @@
-*23/07/2021*
-- Changed all imports of relative paths to absolute paths
-- Added dates to changelogs
-- Changed changelog to show all changelogs by default

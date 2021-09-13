@@ -5,17 +5,24 @@ const { MessageAttachment, MessageEmbed } = require("discord.js");
 
 module.exports = {
 	name: "stats",
-	aliases: ["player", "p"],
-	args: {
-		required: ["name"],
-		optional: ["formatted"]
+	description: "Show the statistics of a given player, list by default",
+	options: [{
+		name: "name",
+		type: "STRING",
+		description: "Player's name",
+		required: true
 	},
-	description: "Show the statistics of a given player, in plain text by default.",
-	example: "stats Invinci true",
-	cooldown: 5,
+	{
+		name: "formatted",
+		type: "BOOLEAN",
+		description: "Whether the stats are formatted (instead of a list)",
+		required: false
+	}],
+	async execute(interaction) {
+		const name = interaction.options.getString("name");
+		const formatted = interaction.options.getBoolean("formatted");
 
-	async execute(msg, args) {
-		const { code, data } = await fetchPlayer(args[0]);
+		const { code, data } = await fetchPlayer(name);
 		try {
 			const player = data[0];
 
@@ -26,7 +33,7 @@ module.exports = {
 
 			let forumData = fetchForumData(player.username);
 
-			if (args.length > 1 && args[1].toLowerCase() === "true") {
+			if (formatted) {
 				embed.setTitle(`Player Stats for ${player.username}`);
 				embed.setURL(`https://wynncraft.com/stats/player/${player.username}`);
 				embed.setDescription((player.guild.name !== null) ? `${toTitleCase(player.guild.rank)} of **${player.guild.name}**` : "*Not part of a guild*");
@@ -107,9 +114,9 @@ module.exports = {
 			if (forumData !== null) {
 				embed.addField("\u200b", `[Forum page](https://forums.wynncraft.com/members/${forumData.id}) (${forumData.username})`);
 			}
-			msg.channel.send(message);
+			await interaction.followUp(message);
 		} catch (e) {
-			msg.channel.send({embeds: [createErrorEmbed(`Failed to retrieve player stats for ${args[0]}`, "")]});
+			await interaction.followUp({embeds: [createErrorEmbed(`Failed to retrieve player stats for ${name}`, "")]});
 			console.log(`Error code: ${code}`);
 			console.log(e);
 		}

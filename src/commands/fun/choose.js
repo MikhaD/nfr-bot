@@ -1,11 +1,11 @@
 const path = require("path");
-const { randint } = require(path.join(__dirname, "../../utility/_utility"));
+const { randint } = require(path.join(__dirname, "../../utility/utility"));
 
 module.exports = {
 	name: "choose",
 	aliases: ["pick"],
 	args: {
-		optional: ["option 1", "option 2", "option 3", "..."]
+		optional: ["option1", "option2", "option3", "..."]
 	},
 	description: "Choose one of the provided options at random",
 	example: "choose him her them 'no one'",
