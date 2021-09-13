@@ -5,7 +5,7 @@
 	<a href="https://discord.gg/55XKx6mPuK">
 		<img alt="Discord" src="https://img.shields.io/discord/739428526431666237?label=Nefarious%20Ravens&logo=discord&logoColor=ffffff&color=5865F2">
 	</a>
-	<img alt="version" src="https://img.shields.io/github/package-json/v/MikhaD/nfr-bot?color=992699&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgdmlld0JveD0iMCAwIDYgNiI%2BPHBhdGggZmlsbD0iI2ZmZiIgZD0iTTMsMGwyLDBsMCwxbDEsMGwwLDFsLTIsMGwwLDFsLTEsMGwwLDJsMSwwbDAsMWwtMiwwbDAsLTJsLTEsMGwwLC0xIGwtMSwwbDAsLTFsMiwwbDAsLTFsMSwweiIvPjwvc3ZnPg%3D%3D">
+	<img alt="version" src="https://img.shields.io/github/package-json/v/MikhaD/nfr-bot/stable?color=992699&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgdmlld0JveD0iMCAwIDYgNiI%2BPHBhdGggZmlsbD0iI2ZmZiIgZD0iTTMsMGwyLDBsMCwxbDEsMGwwLDFsLTIsMGwwLDFsLTEsMGwwLDJsMSwwbDAsMWwtMiwwbDAsLTJsLTEsMGwwLC0xIGwtMSwwbDAsLTFsMiwwbDAsLTFsMSwweiIvPjwvc3ZnPg%3D%3D">
 </div>
 
 ---
