@@ -3,7 +3,8 @@ const { MessageAttachment, Util } = require("discord.js");
 const Embed = require("../../utility/Embed");
 const MessageObject = require("../../utility/MessageObject");
 const config = require(path.join(__dirname, "../../config.json"));
-const { createErrorEmbed, fetchPlayer, fetchGuild, createBannerImage } = require(path.join(__dirname, "../../utility/utility"));
+const { fetchPlayer, fetchGuild } = require(path.join(__dirname, "../../utility/utility"));
+const ErrorEmbed = require("../../utility/ErrorEmbed");
 
 module.exports = {
 	name: "absences",
@@ -33,13 +34,13 @@ module.exports = {
 		if (guild.error) {
 			if (guild.error === "Guild not found") {
 				return await interaction.followUp({
-					embeds: [createErrorEmbed(
+					embeds: [new ErrorEmbed(
 						`Failed to retrieve data for ${guildName}`,
 						"**Note:** Guild names are case sensitive. You also need to use the full name, not just the prefix (Nefarious Ravens not NFR)"
 					)]
 				});
 			}
-			return await interaction.followUp({ embeds: [createErrorEmbed(`Failed to retrieve data for ${guildName}`, guild.error)] });
+			return await interaction.followUp({ embeds: [new ErrorEmbed(`Failed to retrieve data for ${guildName}`, guild.error)] });
 		}
 		//info Start fetching player data
 		let AbsenteeData = getAbsenteeData(guild.members);

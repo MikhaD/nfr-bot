@@ -1,7 +1,8 @@
 const path = require("path");
-const { fetchPlayer, createErrorEmbed, toTitleCase, makeDateFriendly, spaceNumber, asHours, asDistance, createRankImage, spaceBetween, fetchPlayerFace, fetchForumData } = require(path.join(__dirname, "../../utility/utility"));
+const { fetchPlayer, toTitleCase, makeDateFriendly, spaceNumber, asHours, asDistance, createRankImage, spaceBetween, fetchPlayerFace, fetchForumData } = require(path.join(__dirname, "../../utility/utility"));
 const config = require(path.join(__dirname, "../../config.json"));
 const { MessageAttachment, MessageEmbed } = require("discord.js");
+const ErrorEmbed = require("../../utility/ErrorEmbed");
 
 module.exports = {
 	name: "stats",
@@ -116,7 +117,7 @@ module.exports = {
 			}
 			await interaction.followUp(message);
 		} catch (e) {
-			await interaction.followUp({ embeds: [createErrorEmbed(`Failed to retrieve player stats for ${name}`, "")] });
+			await interaction.followUp({ embeds: [new ErrorEmbed(`Failed to retrieve player stats for ${name}`, "")] });
 			console.log(`Error code: ${code}`);
 			console.log(e);
 		}

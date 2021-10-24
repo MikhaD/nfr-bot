@@ -1,9 +1,10 @@
 
-- Made absences command faster by generating banner image and fetching player data in parallel
+- Absences now uses an external api for guild banner images
 - Updated to discord.js v13
 - Modified command handler to accept slash commands
 - Fixed crash error if fetchPlayerFace returns null in stats command
 - Changed to semver versioning system instead of my own bespoke system
 - Converted all commands to slash commands
+- Implemented a system for easily creating multi page embeds
 
 - A bunch of other changes, see [github](https://github.com/MikhaD/nfr-bot) for details
