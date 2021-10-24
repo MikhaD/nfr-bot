@@ -24,7 +24,7 @@ for (const dir of readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.
 		const command = require(`./commands/${dir}/${file}`);
 		command.category = dir;
 		client.commands.set(command.name, command);
-		helpData.choices.push({name: `/${command.name}`, value: command.name});
+		if (command.category !== "dev") helpData.choices.push({name: `/${command.name}`, value: command.name});
 	}
 }
 client.commands.get("help").options[0].choices = helpData.choices;

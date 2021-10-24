@@ -39,27 +39,27 @@ module.exports = {
 
 		if (totalDeleted === messages) {
 			if (ephemeral) {
-				await interaction.followUp({embeds: [new SuccessEmbed(
+				await interaction.followUp(new SuccessEmbed(
 					`${messages} message${(messages !== 1) ? "s" : ""} deleted from #${interaction.channel.name}`,
 					""
-				)]});
+				));
 			} else {
-				await interaction.channel.send({embeds: [new SuccessEmbed(
+				await interaction.channel.send(new SuccessEmbed(
 					`${messages - 1} message${(messages !== 2) ? "s" : ""} deleted from #${interaction.channel.name}`,
 					"Use `ephemeral: true` to not show this message"
-				)]});
+				));
 			}
 		} else if (totalDeleted !== messages) {
 			if (ephemeral) {
-				await interaction.followUp({embeds: [new WarnEmbed(
+				await interaction.followUp(new WarnEmbed(
 					`${totalDeleted} of ${messages} messages deleted`,
 					"Messages over 2 weeks old are unable to be deleted"
-				)]});
+				));
 			} else {
-				await interaction.channel.send({embeds: [new WarnEmbed(
+				await interaction.channel.send(new WarnEmbed(
 					`${totalDeleted - 1} of ${messages - 1} messages deleted`,
 					"Messages over 2 weeks old are unable to be deleted"
-				)]});
+				));
 			}
 		}
 	}

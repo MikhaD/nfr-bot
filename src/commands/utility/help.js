@@ -40,10 +40,12 @@ module.exports = {
 			const message = new MessageObject();
 			const categories = new Map();
 			for (const cmd of interaction.client.commands) {
-				if (!categories.get(cmd[1].category)) {
-					categories.set(cmd[1].category, new Embed(`${cmd[1].category} commands`));
+				if (cmd[1].category !== "dev") {
+					if (!categories.get(cmd[1].category)) {
+						categories.set(cmd[1].category, new Embed(`${cmd[1].category} commands`));
+					}
+					categories.get(cmd[1].category).addField(`/${cmd[0]} ${parseArguments(cmd[1])}`, cmd[1].description);
 				}
-				categories.get(cmd[1].category).addField(`/${cmd[0]} ${parseArguments(cmd[1])}`, cmd[1].description);
 			}
 			for (const embed of categories.values()) {
 				message.addPage(embed);

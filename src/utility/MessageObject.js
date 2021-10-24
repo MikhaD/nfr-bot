@@ -18,6 +18,7 @@ module.exports = class MessageObject {
 	/**
 	 * Pages should only be added once they have had all of their own pages added to them, otherwise there will be inconsistancies
 	 * @param {Embed | EmbedChapter} page - Either an Embed or an EmbedChapter
+	 * @returns this
 	 */
 	addPage(page) {
 		this.pages.addPage(page);
@@ -27,6 +28,7 @@ module.exports = class MessageObject {
 		if ((this.pages.length > 1 || page.pages.length > 1) && this.components.length === 0) {
 			this.components = [new MessageActionRow().addComponents(new PrevButton(), new NextButton)];
 		}
+		return this;
 	}
 
 	/**
@@ -44,25 +46,27 @@ module.exports = class MessageObject {
 	}
 
 	watchMessage(message) {
-		const collector = message.channel.createMessageComponentCollector({ componentType: "BUTTON", time: this.buttonsTimeout, message });
-		collector.on("collect", async (btnInteraction) => {
-			btnInteraction.deferUpdate();
+		if (this.pages.length > 1) {
+			const collector = message.channel.createMessageComponentCollector({ componentType: "BUTTON", time: this.buttonsTimeout, message });
+			collector.on("collect", async (btnInteraction) => {
+				btnInteraction.deferUpdate();
 
-			if (btnInteraction.customId === "next") {
-				// next button pressed
-				this.embeds = [this.pages.nextPage()];
-			} else if (btnInteraction.customId === "previous") {
-				// prev button pressed
-				this.embeds = [this.pages.previousPage()];
-			} else {
-				// page button pressed (not yet implemented in this version)
-			}
-			message.edit(this);
-		});
+				if (btnInteraction.customId === "next") {
+					// next button pressed
+					this.embeds = [this.pages.nextPage()];
+				} else if (btnInteraction.customId === "previous") {
+					// prev button pressed
+					this.embeds = [this.pages.previousPage()];
+				} else {
+					// page button pressed (not yet implemented in this version)
+				}
+				message.edit(this);
+			});
 
-		collector.on("end", async () => {
-			await message.edit({ components: [] });
-		});
+			collector.on("end", async () => {
+				await message.edit({ components: [] });
+			});
+		}
 	}
 };
 

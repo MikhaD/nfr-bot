@@ -120,8 +120,10 @@ module.exports.SuccessEmbed = class SuccessEmbed extends MessageEmbed {
 	constructor(title, description) {
 		super();
 
-		this.setTitle(`${title}`);
-		this.setDescription(`${description}`);
+		/** This property allows Embed objects to be send directly */
+		this.embeds = [this];
+		this.setTitle(`${title || ""}`);
+		this.setDescription(`${description || ""}`);
 		this.setColor(config.colors.embed.success);
 	}
 };
@@ -135,8 +137,10 @@ module.exports.WarnEmbed = class WarnEmbed extends MessageEmbed {
 	constructor(title, description) {
 		super();
 
-		this.setTitle(`${title}`);
-		this.setDescription(`${description}`);
+		/** This property allows Embed objects to be send directly */
+		this.embeds = [this];
+		this.setTitle(`${title || ""}`);
+		this.setDescription(`${description || ""}`);
 		this.setColor(config.colors.embed.warn);
 	}
 };
@@ -150,8 +154,10 @@ module.exports.ErrorEmbed = class ErrorEmbed extends MessageEmbed {
 	constructor(title, description) {
 		super();
 
-		this.setTitle(`${title}`);
-		this.setDescription(`${description}`);
+		/** This property allows Embed objects to be send directly */
+		this.embeds = [this];
+		this.setTitle(`${title || ""}`);
+		this.setDescription(`${description || ""}`);
 		this.setColor(config.colors.embed.error);
 	}
 };

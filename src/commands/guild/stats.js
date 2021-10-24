@@ -118,7 +118,7 @@ module.exports = {
 			}
 			await interaction.followUp(message);
 		} catch (e) {
-			await interaction.followUp({ embeds: [new ErrorEmbed(`Failed to retrieve player stats for ${name}`, "")] });
+			await interaction.followUp(new ErrorEmbed(`Failed to retrieve player stats for ${name}`));
 			console.log(`Error code: ${code}`);
 			console.log(e);
 		}

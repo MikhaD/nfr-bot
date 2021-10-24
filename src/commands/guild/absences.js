@@ -34,14 +34,12 @@ module.exports = {
 		const guild = await fetchGuild(guildName);
 		if (guild.error) {
 			if (guild.error === "Guild not found") {
-				return await interaction.followUp({
-					embeds: [new ErrorEmbed(
-						`Failed to retrieve data for ${guildName}`,
-						"**Note:** Guild names are case sensitive. You also need to use the full name, not just the prefix (Nefarious Ravens not NFR)"
-					)]
-				});
+				return await interaction.followUp(new ErrorEmbed(
+					`Failed to retrieve data for ${guildName}`,
+					"**Note:** Guild names are case sensitive. You also need to use the full name, not just the prefix (Nefarious Ravens not NFR)"
+				));
 			}
-			return await interaction.followUp({ embeds: [new ErrorEmbed(`Failed to retrieve data for ${guildName}`, guild.error)] });
+			return await interaction.followUp(new ErrorEmbed(`Failed to retrieve data for ${guildName}`, guild.error));
 		}
 		//info Fetch player data
 		const AbsenteeData = await getAbsenteeData(guild.members);
