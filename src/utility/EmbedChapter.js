@@ -1,4 +1,5 @@
-const Embed = require("./Embed");
+// eslint-disable-next-line no-unused-vars
+const { Embed } = require("./Embed");
 
 module.exports = class EmbedChapter {
 	/**

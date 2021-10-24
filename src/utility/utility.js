@@ -1,6 +1,3 @@
-const path = require("path");
-const config = require(path.join(__dirname, "../config.json"));
-const { MessageEmbed } = require("discord.js");
 const { createCanvas, loadImage } = require("canvas");
 const fetch = require("node-fetch");
 
@@ -15,55 +12,6 @@ module.exports.setDefaultArgs = function(defaults, args) {
 	for (const i in defaults) {
 		result.push((args.length >= i + 1) ? args[i] : defaults[i]);
 	}
-	return result;
-};
-
-/**
- * Create a standard simple embed (default highlight)
- * @param {string} title - The embed's title
- * @param {string} text - The embed's text
- * @returns a Discord.MessageEmbed object
- */
-module.exports.createStandardEmbed = function(title, text) {
-	return new MessageEmbed()
-		.setTitle(`${title}`)
-		.setDescription(`${text}`)
-		.setColor(config.colors.embed.default);
-};
-
-/**
- * Create a standard success embed (green highlight)
- * @param {string} title - The embed's title
- * @param {string} text - The embed's text
- * @returns a Discord.MessageEmbed object
- */
-module.exports.createSuccessEmbed = function(title, text) {
-	const result = new exports.createStandardEmbed(title, text);
-	result.setColor(config.colors.embed.success);
-	return result;
-};
-
-/**
- * Create a standard warning embed (orange highlight)
- * @param {string} title - The embed's title
- * @param {string} text - The embed's text
- * @returns a Discord.MessageEmbed object
- */
-module.exports.createWarnEmbed = function(title, text) {
-	const result = new exports.createStandardEmbed(title, text);
-	result.setColor(config.colors.embed.warn);
-	return result;
-};
-
-/**
- * Create a standard error embed (red highlight)
- * @param {string} title - The embed's title
- * @param {string} text - The embed's text
- * @returns a Discord.MessageEmbed object
- */
-module.exports.createErrorEmbed = function(title, text) {
-	const result = new exports.createStandardEmbed(title, text);
-	result.setColor(config.colors.embed.error);
 	return result;
 };
 

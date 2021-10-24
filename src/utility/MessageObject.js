@@ -1,5 +1,8 @@
 const EmbedChapter = require("./EmbedChapter");
+// eslint-disable-next-line no-unused-vars
 const { MessageButton, MessageActionRow, MessageAttachment } = require("discord.js");
+// eslint-disable-next-line no-unused-vars
+const { Embed } = require("./Embed");
 
 module.exports = class MessageObject {
 	constructor(text) {
@@ -14,7 +17,7 @@ module.exports = class MessageObject {
 
 	/**
 	 * Pages should only be added once they have had all of their own pages added to them, otherwise there will be inconsistancies
-	 * @param {Object} page - Either an Embed or an EmbedChapter
+	 * @param {Embed | EmbedChapter} page - Either an Embed or an EmbedChapter
 	 */
 	addPage(page) {
 		this.pages.addPage(page);

@@ -1,7 +1,7 @@
 const { MessageEmbed } = require("discord.js");
 const config = require("../config.json");
 
-module.exports = class Embed extends MessageEmbed {
+module.exports.Embed = class Embed extends MessageEmbed {
 	/**
 	 * Create a new multi page capable message embed with the default color highlight
 	 * @param {string} title - The embed title
@@ -106,5 +106,50 @@ module.exports = class Embed extends MessageEmbed {
 	lastPage() {
 		this.index = this.pages.length - 1;
 		return this.pages.at(-1);
+	}
+};
+
+module.exports.SuccessEmbed = class SuccessEmbed extends MessageEmbed {
+	/**
+	 * Create a new message embed with the success highlight
+	 * @param {string} title - The success message title
+	 * @param {string} description - The success message description
+	 */
+	constructor(title, description) {
+		super();
+
+		this.setTitle(`${title}`);
+		this.setDescription(`${description}`);
+		this.setColor(config.colors.embed.success);
+	}
+};
+
+module.exports.WarnEmbed = class WarnEmbed extends MessageEmbed {
+	/**
+	 * Create a new message embed with the warning highlight
+	 * @param {string} title - The warning message title
+	 * @param {string} description - The warning message description
+	 */
+	constructor(title, description) {
+		super();
+
+		this.setTitle(`${title}`);
+		this.setDescription(`${description}`);
+		this.setColor(config.colors.embed.warn);
+	}
+};
+
+module.exports.ErrorEmbed = class ErrorEmbed extends MessageEmbed {
+	/**
+	 * Create a new message embed with the error highlight
+	 * @param {string} title - The error message title
+	 * @param {string} description - The error message description
+	 */
+	constructor(title, description) {
+		super();
+
+		this.setTitle(`${title}`);
+		this.setDescription(`${description}`);
+		this.setColor(config.colors.embed.error);
 	}
 };

@@ -2,7 +2,7 @@ const path = require("path");
 const { fetchPlayer, toTitleCase, makeDateFriendly, spaceNumber, asHours, asDistance, createRankImage, spaceBetween, fetchPlayerFace, fetchForumData } = require(path.join(__dirname, "../../utility/utility"));
 const config = require(path.join(__dirname, "../../config.json"));
 const { MessageAttachment, MessageEmbed } = require("discord.js");
-const ErrorEmbed = require("../../utility/ErrorEmbed");
+const { ErrorEmbed } = require("../../utility/Embed");
 
 module.exports = {
 	name: "stats",

@@ -1,8 +1,9 @@
 const { readdirSync } = require("fs");
 const path = require("path");
 const Discord = require("discord.js");
+const { ErrorEmbed } = require("./utility/Embed");
 const config = require(path.join(__dirname, "./config.json"));
-const { createErrorEmbed, parsePermissions } = require(path.join(__dirname, "./utility/utility.js"));
+const { parsePermissions } = require(path.join(__dirname, "./utility/utility.js"));
 
 const client = new Discord.Client({
 	partials: ["MESSAGE", "REACTION", "CHANNEL"],
@@ -86,7 +87,7 @@ client.on("interactionCreate", async interaction => {
 			}
 		} catch (e) {
 			console.log(e);
-			const err = createErrorEmbed("Failed to execute command", e);
+			const err = new ErrorEmbed("Failed to execute command", e);
 			await interaction.followUp({ embeds: [err], ephemeral: true });
 		}
 	}

@@ -1,5 +1,4 @@
-const SuccessEmbed = require("../../utility/SuccessEmbed");
-const WarnEmbed = require("../../utility/WarnEmbed");
+const { SuccessEmbed, WarnEmbed } = require("../../utility/Embed");
 
 module.exports = {
 	name: "purge",

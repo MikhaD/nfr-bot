@@ -1,10 +1,9 @@
 const path = require("path");
 const { Util } = require("discord.js");
-const Embed = require("../../utility/Embed");
+const { Embed, ErrorEmbed } = require("../../utility/Embed");
 const MessageObject = require("../../utility/MessageObject");
 const config = require(path.join(__dirname, "../../config.json"));
 const { fetchPlayer, fetchGuild } = require(path.join(__dirname, "../../utility/utility"));
-const ErrorEmbed = require("../../utility/ErrorEmbed");
 
 module.exports = {
 	name: "absences",
@@ -71,11 +70,10 @@ module.exports = {
 		));
 
 		if (AbsenteeData.failed.length) {
-			const failedEmbed = new Embed(
+			const failedEmbed = new ErrorEmbed(
 				"Failed:",
 				"Failed to fetch data for the following players. This is likely due to these players changing their names while in the guild."
 			);
-			failedEmbed.setColor(config.colors.embed.error);
 			for (const i of AbsenteeData.failed) {
 				failedEmbed.addField("\u200b", `[**${Util.escapeItalic(i)}**](https://namemc.com/search?q=${i} "See name history")`);
 			}

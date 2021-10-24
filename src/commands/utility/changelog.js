@@ -1,7 +1,7 @@
 const path = require("path");
 const pkg = require(path.join(__dirname, "../../../package.json"));
 const { readdirSync, readFileSync } = require("fs");
-const Embed = require("../../utility/Embed");
+const { Embed } = require("../../utility/Embed");
 
 const logsPath = path.join(__dirname, "../../../changelogs");
 const versions = readdirSync(logsPath);
