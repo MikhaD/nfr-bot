@@ -1,40 +1,42 @@
 const path = require("path");
-const { createErrorEmbed } = require(path.join(__dirname, "../../utility/utility"));
-const config = require(path.join(__dirname, "../../config.json"));
 const pkg = require(path.join(__dirname, "../../../package.json"));
 const { readdirSync, readFileSync } = require("fs");
-const { MessageEmbed } = require("discord.js");
+const Embed = require("../../utility/Embed");
+
+const logsPath = path.join(__dirname, "../../../changelogs");
+const versions = readdirSync(logsPath);
+const choices = [];
+
+for (const version of versions.reverse()) {
+	choices.push({
+		name: `${version.slice(0, -4)}`,
+		value: `${version.slice(0, -4)}`
+	});
+}
 
 module.exports = {
 	name: "changelog",
-	args: {
-		optional: ["version"]
-	},
-	description: "Display the list of changes for a given version. If no version is given all changelogs will be shown.",
-	example: "changelog",
+	description: "Display the list of changes for a given version, latest by default",
 	cooldown: 5,
-	permissions: ["ADMINISTRATOR"],
+	options: [{
+		name: "version",
+		type: "STRING",
+		description: "the version you wish to display the changelog for",
+		required: true,
+		choices: choices
+	}],
+	perms: ["MANAGE_GUILD"],
 
-	execute(msg, args) {
-		const logsPath = path.join(__dirname, "../../../changelogs");
-		const versions = readdirSync(logsPath);
-		const changelog = new MessageEmbed();
-		if (args.length > 0) {
-			if (versions.includes(`${args[0]}.txt`)) {
-				changelog.setTitle(`Version ${args[0]} changelog:`);
-				changelog.setDescription(readFileSync(`${logsPath}/${args[0]}.txt`).toString());
-				changelog.setAuthor(`Current version: ${pkg.version}`);
-			} else {
-				msg.channel.send({embeds: [createErrorEmbed("", `${args[0]} is not a valid version number`)]});
-				return;
-			}
-		} else {
-			for (const version of versions) {
-				changelog.addField(`Version ${version.slice(0, -4)} changelog:`, readFileSync(`${logsPath}/${version}`).toString());
-			}
-		}
-		changelog.setThumbnail(msg.client.user.avatarURL());
-		changelog.setColor(config.colors.embed.default);
-		msg.channel.send({embeds: [changelog]});
+	async execute(interaction) {
+		const version = interaction.options.getString("version");
+
+		const changelog = new Embed(
+			`Version ${version} changelog:`,
+			readFileSync(`${logsPath}/${version}.txt`).toString()
+		);
+
+		changelog.setAuthor(`Current version: ${pkg.version}`, interaction.client.user.avatarURL());
+
+		await interaction.followUp({embeds: [changelog]});
 	}
 };

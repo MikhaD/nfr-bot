@@ -1,22 +1,19 @@
 const path = require("path");
-const config = require(path.join(__dirname, "../../config.json"));
 const { randint } = require(path.join(__dirname, "../../utility/utility"));
+const config = require(path.join(__dirname, "../../config.json"));
 
 module.exports = {
 	name: "roll",
-	aliases: ["d", "dice"],
-	args: {
-		optional: ["dice_sides"]
-	},
-	description: "Roll a dice with x number of sides",
-	example: "roll 20",
+	description: "Roll a dice with x number of sides, 6 by default",
+	options: [{
+		name: "sides",
+		type: "INTEGER",
+		description: "The number of sides on the die",
+		required: false
+	}],
 
-	execute(msg, args) {
-		let sides = config.defualt_dice;
-		if (args.length > 0 && !isNaN(args[0])) {
-			sides = Math.floor(args[0]);
-		}
-
-		msg.channel.send(randint(sides) + 1);
+	async execute(interaction) {
+		const sides = interaction.options.getInteger("sides");
+		await interaction.followUp(`${randint(sides ? sides : config.defualt_dice) + 1}`);
 	}
 };

@@ -1,82 +1,93 @@
 const path = require("path");
-const { MessageAttachment, Util, MessageEmbed } = require("discord.js");
+const { Util } = require("discord.js");
+const Embed = require("../../utility/Embed");
+const MessageObject = require("../../utility/MessageObject");
 const config = require(path.join(__dirname, "../../config.json"));
-const { createErrorEmbed, fetchPlayer, fetchGuild, createBannerImage } = require(path.join(__dirname, "../../utility/utility"));
+const { fetchPlayer, fetchGuild } = require(path.join(__dirname, "../../utility/utility"));
+const ErrorEmbed = require("../../utility/ErrorEmbed");
 
 module.exports = {
 	name: "absences",
-	aliases: ["abs"],
-	args: {
-		optional: ["guild", "min_days"]
-	},
-	description: "List players from a guild who have been absent for `min_days` number of days, Nefarious Ravens and 7 days by default.",
-	example: "absences Nefarious Ravens 15",
+	description: "List players from a guild who have been absent for a given number of days",
 	cooldown: 30,
-	permissions: ["ADMINISTRATOR"],
+	options: [{
+		name: "guild",
+		type: "STRING",
+		// The name or prefix of the guild to check once I implement the prefix lookup table
+		description: "The name of the guild to check",
+		required: false
+	},
+	{
+		name: "days",
+		type: "INTEGER",
+		description: "The minimum number of days absent",
+		required: false
+	}],
 
-	async execute(msg, args) {
+	async execute(interaction) {
 		//info ###################################### Process arguments ######################################
-		let guildName = config.default_guild;
-		if (args.length > 0) {
-			guildName = "";
-			while (args.length) {
-				if (isNaN(args[0])) {
-					guildName += `${args.shift()} `;
-				} else break;
-			}
-		}
+		let guildName = interaction.options.getString("guild") || config.default_guild;
 		guildName = guildName.trim();
-		const period = parseInt((args.length === 0) ? config.min_days : args[0]);
+		const days = interaction.options.getInteger("days") || config.min_days;
 
 		//info ################################## Fetch absent players data ##################################
 		const guild = await fetchGuild(guildName);
 		if (guild.error) {
 			if (guild.error === "Guild not found") {
-				msg.channel.send({
-					embeds: [createErrorEmbed(
+				return await interaction.followUp({
+					embeds: [new ErrorEmbed(
 						`Failed to retrieve data for ${guildName}`,
 						"**Note:** Guild names are case sensitive. You also need to use the full name, not just the prefix (Nefarious Ravens not NFR)"
 					)]
 				});
-			} else {
-				msg.channel.send({ embeds: [createErrorEmbed(`Failed to retrieve data for ${guildName}`, guild.error)] });
 			}
-			return;
+			return await interaction.followUp({ embeds: [new ErrorEmbed(`Failed to retrieve data for ${guildName}`, guild.error)] });
 		}
-		//info Start fetching player data
-		const AbsenteeData = getAbsenteeData(guild.members);
-		const message = {};
-		const embed = new MessageEmbed()
-			.setTitle(`${guildName} Absences:`)
-			.setColor(config.colors.embed.default);
+		//info Fetch player data
+		const AbsenteeData = await getAbsenteeData(guild.members);
 
-		//info Generate guild banner and attach it as thumbnail if guild has a banner
-		if (guild.banner) {
-			const attachmentName = "rankImage.png";
-			const attachment = new MessageAttachment(await createBannerImage(guild.banner), attachmentName);
-			message.files = [attachment];
-			embed.setThumbnail(`attachment://${attachmentName}`);
-		}
-		// once player data has been fetched
-		AbsenteeData.then(data => {
-			let absentees = 0;
-			//info Sort absences by time absent
-			data.absences = new Map([...data.absences.entries()].sort((a, b) => b[1] - a[1]));
-			for (const i of data.absences) {
-				if (i[1] >= period) {
-					++absentees;
-					embed.addField(Util.escapeItalic(i[0]), `${i[1]} days`);
-				}
+		const embed = new Embed(`${guildName} Absences:`, "", true);
+		//info Create message and add guild banner thumbnail
+		const message = new MessageObject();
+		message.setThumbnail(`${config.guildBannerUrl}${guildName.replaceAll(" ", "%20")}`);
+
+		let absentees = 0;
+		let absenteeNames = "";
+		//info Sort absences by time absent
+		AbsenteeData.absences = new Map([...AbsenteeData.absences.entries()].sort((a, b) => b[1] - a[1]));
+		for (const i of AbsenteeData.absences) {
+			if (i[1] >= days) {
+				++absentees;
+				embed.addField(Util.escapeItalic(i[0]), `${i[1]} days`);
+				absenteeNames += `${Util.escapeItalic(i[0])}\n`;
 			}
-			embed.setDescription(`The following ${absentees} people have been absent for ${period}+ days`);
+		}
+		embed.setDescription(`The following ${absentees} people have been absent for ${days}+ days`);
 
-			//! Failed players should have clock reaction to return to absences (if more than ~5 have failed it is likely the api has been pinged too many times)
-			embed.setFooter(
-				`${(Math.ceil(absentees / 25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(data.failed.length) ? ", ❗Show failed" : ""}
-				\npage 1 of ${Math.ceil(absentees / 25)}`);
-			message.embeds = [embed];
-			msg.channel.send(message);
-		});
+		message.addPage(embed);
+		message.addPage(new Embed(
+			"Absences Copy List:",
+			`The following ${absentees} people have been absent for ${days}+ days.\nDuration absent hidden for easy copying.\n\n**${absenteeNames}**`
+		));
+
+		if (AbsenteeData.failed.length) {
+			const failedEmbed = new Embed(
+				"Failed:",
+				"Failed to fetch data for the following players. This is likely due to these players changing their names while in the guild."
+			);
+			failedEmbed.setColor(config.colors.embed.error);
+			for (const i of AbsenteeData.failed) {
+				failedEmbed.addField("\u200b", `[**${Util.escapeItalic(i)}**](https://namemc.com/search?q=${i} "See name history")`);
+			}
+			message.addPage(failedEmbed);
+		}
+		//! Failed players should have clock reaction to return to absences (if more than ~5 have failed it is likely the api has been pinged too many times)
+		// embed.setFooter(
+		// 	`${(Math.ceil(absentees / 25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(AbsenteeData.failed.length) ? ", ❗Show failed" : ""}
+		// 	\npage 1 of ${Math.ceil(absentees / 25)}`);
+
+		const msg = await interaction.followUp(message);
+		message.watchMessage(msg);
 	}
 };
 
@@ -108,6 +119,11 @@ async function getAbsenteeData(members) {
 	return result;
 }
 
+/**
+ * Find the number of days since a given time
+ * @param {String} timeString - A time string in the format returned by the wynncraft API
+ * @returns The rounded down number of days since a given time
+ */
 function daysSince(timeString) {
 	const time = [];
 	let previous = 0;

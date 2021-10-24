@@ -3,48 +3,44 @@ const { randint } = require(path.join(__dirname, "../../utility/utility"));
 
 module.exports = {
 	name: "choose",
-	aliases: ["pick"],
-	args: {
-		optional: ["option1", "option2", "option3", "..."]
-	},
 	description: "Choose one of the provided options at random",
-	example: "choose him her them 'no one'",
+	options: [{
+		name: "options",
+		type: "STRING",
+		description: "A list of space seperated options. Strings in inverted commas count as one option",
+		required: true
+	}],
+	async execute(interaction) {
+		//info ######## combine groups of args that start and end in inverted commas into single args ########
+		let comma = "";
+		let args = [];
+		let str = "";
+		const options = interaction.options.getString("options").replaceAll(/\s+/g, " ");
 
-	execute(msg, args) {
-		if (!args.length) {
-			msg.channel.send(`You didn't specify any options to choose from, so I choose you ${msg.author}`);
-		} else {
-			//info ###### combine groups of args that start and end in inverted commas into single args ######
-			let comma = "";
-			let newArgs = [];
-			let str = "";
-			args = args.join(" ");
-
-			for (let i = 0; i < args.length; ++i) {
-				if (!comma) {
-					if (["'", "\""].includes(args[i]) || args[i] === " ") {
-						if (["'", "\""].includes(args[i])) {
-							comma = args[i];
-						}
-						(str !== "") ? newArgs.push(str) : false;
-						str = "";
-					} else {
-						str += args[i];
+		for (let i = 0; i < options.length; ++i) {
+			if (!comma) {
+				if (["'", "\""].includes(options[i]) || options[i] === " ") {
+					if (["'", "\""].includes(options[i])) {
+						comma = options[i];
 					}
+					(str !== "") ? args.push(str) : false;
+					str = "";
 				} else {
-					if (args[i] === comma) {
-						(str !== "") ? newArgs.push(str) : false;
-						str = "";
-						comma = "";
-					} else {
-						str += args[i];
-					}
+					str += options[i];
+				}
+			} else {
+				if (options[i] === comma) {
+					(str !== "") ? args.push(str) : false;
+					str = "";
+					comma = "";
+				} else {
+					str += options[i];
 				}
 			}
-			(str !== "") ? newArgs.push(str) : false;
-
-			//info ########################### choose and return a random argument ###########################
-			msg.channel.send(newArgs[randint(newArgs.length)]);
 		}
+		if (str !== "") args.push(str);
+
+		//info ############################# choose and return a random argument #############################
+		await interaction.followUp(`${args[[randint(args.length)]]}`);
 	}
 };
