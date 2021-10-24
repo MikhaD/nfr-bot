@@ -2,41 +2,24 @@ const { createCanvas, loadImage } = require("canvas");
 const fetch = require("node-fetch");
 
 /**
- * Set all arguments to either the provided argument, or the default if one is not provided
- * @param {array} defaults - Default values for the arguments
- * @param {array} args - User values for the arguments
- * @returns an array of arguments
- */
-module.exports.setDefaultArgs = function(defaults, args) {
-	const result = [];
-	for (const i in defaults) {
-		result.push((args.length >= i + 1) ? args[i] : defaults[i]);
-	}
-	return result;
-};
-
-/**
  * Parse a command's arguments into a string
  * @param {Object} command - The command object to parse the arguments for
- * @returns Argument String
+ * @returns {string} Argument string
  */
 module.exports.parseArguments = function(command) {
-	let result = "";
-	if (command.args) {
-		if (command.args.required) {
-			for (const arg of command.args.required) {
-				result += `<\`${arg}\`> `;
+	if (command.options) {
+		let required = "";
+		let optional = " [";
+		for (const option of command.options) {
+			if (option.required) {
+				required += ` <${option.name}>`;
+			} else {
+				optional += `${option.name}, `;
 			}
 		}
-		if (command.args.optional) {
-			result += "[";
-			for (const arg of command.args.optional) {
-				result += `\`${arg}\` `;
-			}
-			result = `${result.slice(0, -1)}]`;
-		}
+		return required + ((optional.length > 2) ? optional.slice(0, -2) + "]" : "");
 	}
-	return result;
+	return "";
 };
 
 /**

@@ -10,12 +10,14 @@ module.exports.Embed = class Embed extends MessageEmbed {
 	 */
 	constructor(title, description, pageNumbersOn) {
 		super();
-		this.setTitle(`${title}`);
-		this.setDescription(`${description}`);
+		this.setTitle(`${title || ""}`);
+		this.setDescription(`${description || ""}`);
 		this.setColor(config.colors.embed.default);
 		this.index = 0;
 		this.fieldCount = 0;
 		this.pages = [this];
+		/** This property allows Embed objects to be send directly */
+		this.embeds = [this];
 		this.pageNumbersOn = pageNumbersOn || false;
 	}
 

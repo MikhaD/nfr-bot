@@ -13,6 +13,9 @@ client.cooldowns = new Discord.Collection();
 const { cooldowns } = client;
 
 //info ########### get all slash commands from file and set them as properties of the client object ##########
+let helpData = {
+	choices: []
+};
 client.commands = new Discord.Collection();
 //match dirs that don't start with _
 for (const dir of readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.test(dir))) {
@@ -21,12 +24,14 @@ for (const dir of readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.
 		const command = require(`./commands/${dir}/${file}`);
 		command.category = dir;
 		client.commands.set(command.name, command);
+		helpData.choices.push({name: `/${command.name}`, value: command.name});
 	}
 }
+client.commands.get("help").options[0].choices = helpData.choices;
 
 //info ############################################ On bot log in ############################################
 client.once("ready", async () => {
-	client.user.setActivity(`${config.prefix}help`, { type: "PLAYING" });
+	client.user.setActivity("/help", { type: "PLAYING" });
 	//! Register slash commands globally for release version
 	// client.appCmdManager = client.application.commands;
 	client.appCmdManager = client.guilds.cache.get(config.dev_guild_id).commands;
@@ -54,7 +59,6 @@ client.on("interactionCreate", async interaction => {
 				}
 				if (command.perms) {
 					const authorPerms = interaction.channel.permissionsFor(interaction.member);
-					console.log(command.dev, interaction.member.id, config.developer_id);
 					if (!authorPerms || !authorPerms.has(command.perms)) {
 						return interaction.reply({ content: `⛔ ${parsePermissions(command.perms)} is required to use this command`, ephemeral: true });
 					}

@@ -4,6 +4,7 @@ module.exports = {
 	name: "purge",
 	description: "Delete a given number of messages from this channel",
 	cooldown: 5,
+	perms: ["ADMINISTRATOR"],
 	options: [{
 		name: "messages",
 		type: "INTEGER",
@@ -16,7 +17,6 @@ module.exports = {
 		description: "Don't show the success message",
 		required: false
 	}],
-	perms: ["ADMINISTRATOR"],
 
 	async execute(interaction) {
 		const ephemeral = interaction.options.getBoolean("ephemeral");

@@ -7,8 +7,9 @@ const { fetchPlayer, fetchGuild } = require(path.join(__dirname, "../../utility/
 
 module.exports = {
 	name: "absences",
-	description: "List players from a guild who have been absent for a given number of days",
+	description: "List players from a guild who have been absent for x number of days, Nefarious Ravens by default",
 	cooldown: 30,
+	perms: ["MANAGE_GUILD"],
 	options: [{
 		name: "guild",
 		type: "STRING",

@@ -4,7 +4,13 @@
 - Modified command handler to accept slash commands
 - Fixed crash error if fetchPlayerFace returns null in stats command
 - Changed to semver versioning system instead of my own bespoke system
-- Converted all commands to slash commands
+- Converted all commands to slash (/) commands
 - Implemented a system for easily creating multi page embeds
+- Changed status to playing /help instead of \help
+- removed all \ commands
+- Added deprication warning when someone tries to use a \ command
+- Added a new help command
+- Seperated dev commands into their own category
+- Added a new reload command to developer commands
 
 - A bunch of other changes, see [github](https://github.com/MikhaD/nfr-bot) for details

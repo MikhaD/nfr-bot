@@ -18,6 +18,7 @@ module.exports = {
 	name: "changelog",
 	description: "Display the list of changes for a given version, latest by default",
 	cooldown: 5,
+	perms: ["MANAGE_GUILD"],
 	options: [{
 		name: "version",
 		type: "STRING",
@@ -25,7 +26,6 @@ module.exports = {
 		required: true,
 		choices: choices
 	}],
-	perms: ["MANAGE_GUILD"],
 
 	async execute(interaction) {
 		const version = interaction.options.getString("version");
