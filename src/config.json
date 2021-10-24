@@ -7,12 +7,13 @@
 	"defualt_dice": 6,
 	"dev_guild_id": "843909132359958618",
 	"dev_cmd_file_prefix": "$",
+	"guildBannerUrl": "https://wynn-guild-banner.herokuapp.com/banners/",
 	"colors": {
 		"embed": {
 			"default": "#992699",
-			"error": "#992626",
-			"warn": "#995026",
-			"success": "#399926"
+			"error": "#B52424",
+			"warn": "#E38024",
+			"success": "#339020"
 		},
 		"tag": {
 			"null": "#C4AB79",

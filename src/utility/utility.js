@@ -163,6 +163,7 @@ module.exports.colors = {
  * @returns A buffer object of the banner image or null if failed
  */
 module.exports.createBannerImage = async function(data) {
+	if (!data) return null;
 	const width = 40;
 	const height = width * 2;
 	const canvas = createCanvas(width, height);

@@ -1,7 +1,8 @@
 const path = require("path");
-const { fetchPlayer, createErrorEmbed, toTitleCase, makeDateFriendly, spaceNumber, asHours, asDistance, createRankImage, spaceBetween, fetchPlayerFace, fetchForumData } = require(path.join(__dirname, "../../utility/utility"));
+const { fetchPlayer, toTitleCase, makeDateFriendly, spaceNumber, asHours, asDistance, createRankImage, spaceBetween, fetchPlayerFace, fetchForumData } = require(path.join(__dirname, "../../utility/utility"));
 const config = require(path.join(__dirname, "../../config.json"));
 const { MessageAttachment, MessageEmbed } = require("discord.js");
+const ErrorEmbed = require("../../utility/ErrorEmbed");
 
 module.exports = {
 	name: "stats",
@@ -57,7 +58,7 @@ module.exports = {
 				embed.addField("Profession Total:", spaceNumber(player.global.totalLevel.profession), true);
 
 				embed.addField("\u200b", "\u200b");
-				//i For why the playtime is multiplied by 4.7 check https://github.com/Wynncraft/WynncraftAPI/issues/56
+				//info For why the playtime is multiplied by 4.7 check https://github.com/Wynncraft/WynncraftAPI/issues/56
 				embed.addField("Playtime:", asHours(Math.floor(player.meta.playtime * 4.7)), true);
 				embed.addField("Logins:", spaceNumber(player.global.logins), true);
 				embed.addField("Deaths:", spaceNumber(player.global.deaths), true);
@@ -93,7 +94,7 @@ module.exports = {
 				str += spaceBetween("Total Level:", spaceNumber(player.global.totalLevel.combined), width) + "\n";
 				str += spaceBetween("Combat Total:", spaceNumber(player.global.totalLevel.combat), width) + "\n";
 				str += spaceBetween("Profession Total:", spaceNumber(player.global.totalLevel.profession), width) + "\n";
-				//i For why the playtime is multiplied by 4.7 check https://github.com/Wynncraft/WynncraftAPI/issues/56
+				//info For why the playtime is multiplied by 4.7 check https://github.com/Wynncraft/WynncraftAPI/issues/56
 				str += spaceBetween("Playtime:", asHours(Math.floor(player.meta.playtime * 4.7)), width) + "\n";
 				str += spaceBetween("Logins:", spaceNumber(player.global.logins), width) + "\n";
 				str += spaceBetween("Deaths:", spaceNumber(player.global.deaths), width) + "\n";
@@ -116,7 +117,7 @@ module.exports = {
 			}
 			await interaction.followUp(message);
 		} catch (e) {
-			await interaction.followUp({embeds: [createErrorEmbed(`Failed to retrieve player stats for ${name}`, "")]});
+			await interaction.followUp({ embeds: [new ErrorEmbed(`Failed to retrieve player stats for ${name}`, "")] });
 			console.log(`Error code: ${code}`);
 			console.log(e);
 		}

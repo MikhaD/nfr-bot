@@ -1,7 +1,10 @@
 const path = require("path");
-const { MessageAttachment, Util, MessageEmbed } = require("discord.js");
+const { MessageAttachment, Util } = require("discord.js");
+const Embed = require("../../utility/Embed");
+const MessageObject = require("../../utility/MessageObject");
 const config = require(path.join(__dirname, "../../config.json"));
-const { createErrorEmbed, fetchPlayer, fetchGuild, createBannerImage } = require(path.join(__dirname, "../../utility/utility"));
+const { fetchPlayer, fetchGuild } = require(path.join(__dirname, "../../utility/utility"));
+const ErrorEmbed = require("../../utility/ErrorEmbed");
 
 module.exports = {
 	name: "absences",
@@ -21,56 +24,77 @@ module.exports = {
 	}],
 
 	async execute(interaction) {
-		//i ######################################## Process arguments #######################################
+		//info ###################################### Process arguments ######################################
 		let guildName = interaction.options.getString("guild") || config.default_guild;
 		guildName = guildName.trim();
 		const days = interaction.options.getInteger("days") || config.min_days;
 
-		//i #################################### Fetch absent players data ###################################
+		//info ################################## Fetch absent players data ##################################
 		const guild = await fetchGuild(guildName);
 		if (guild.error) {
 			if (guild.error === "Guild not found") {
-				return await interaction.followUp({embeds: [createErrorEmbed(
-					`Failed to retrieve data for ${guildName}`,
-					"**Note:** Guild names are case sensitive. You also need to use the full name, not just the prefix (Nefarious Ravens not NFR)"
-				)]});
+				return await interaction.followUp({
+					embeds: [new ErrorEmbed(
+						`Failed to retrieve data for ${guildName}`,
+						"**Note:** Guild names are case sensitive. You also need to use the full name, not just the prefix (Nefarious Ravens not NFR)"
+					)]
+				});
 			}
-			return await interaction.followUp({embeds: [createErrorEmbed(`Failed to retrieve data for ${guildName}`, guild.error)]});
+			return await interaction.followUp({ embeds: [new ErrorEmbed(`Failed to retrieve data for ${guildName}`, guild.error)] });
 		}
-		//i Start fetching player data
-		const AbsenteeData = getAbsenteeData(guild.members);
-		const message = {};
-		const embed = new MessageEmbed()
-			.setTitle(`${guildName} Absences:`)
-			.setColor(config.colors.embed.default);
+		//info Start fetching player data
+		let AbsenteeData = getAbsenteeData(guild.members);
+		const embed = new Embed(`${guildName} Absences:`, "", true);
 
-		//i Generate guild banner and attach it as thumbnail if guild has a banner
-		if (guild.banner) {
-			const attachmentName = "rankImage.png";
-			const attachment = new MessageAttachment(await createBannerImage(guild.banner), attachmentName);
-			message.files = [attachment];
-			embed.setThumbnail(`attachment://${attachmentName}`);
-		}
-		// once player data has been fetched
-		AbsenteeData.then(async data => {
-			let absentees = 0;
-			//i Sort absences by time absent
-			data.absences = new Map([...data.absences.entries()].sort((a, b) => b[1] - a[1]));
-			for (const i of data.absences) {
-				if (i[1] >= days) {
-					++absentees;
-					embed.addField(Util.escapeItalic(i[0]), `${i[1]} days`);
-				}
+		//info Start generating guild banner if guild has a banner
+		// let banner = createBannerImage(guild.banner);
+
+		AbsenteeData = await AbsenteeData;
+		//info Add banner image to embed if guild has banner
+		const message = new MessageObject();
+		// banner = await banner;
+		// if (banner) {
+		// message.setThumbnail(new MessageAttachment(banner, "banner.png"));
+		message.setThumbnail(`${config.guildBannerUrl}${guildName.replaceAll(" ", "%20")}`);
+		// }
+
+		let absentees = 0;
+		let absenteeNames = "";
+		//info Sort absences by time absent
+		AbsenteeData.absences = new Map([...AbsenteeData.absences.entries()].sort((a, b) => b[1] - a[1]));
+		for (const i of AbsenteeData.absences) {
+			if (i[1] >= days) {
+				++absentees;
+				embed.addField(Util.escapeItalic(i[0]), `${i[1]} days`);
+				absenteeNames += `${Util.escapeItalic(i[0])}\n`;
 			}
-			embed.setDescription(`The following ${absentees} people have been absent for ${days}+ days`);
+		}
+		embed.setDescription(`The following ${absentees} people have been absent for ${days}+ days`);
 
-			//! Failed players should have clock reaction to return to absences (if more than ~5 have failed it is likely the api has been pinged too many times)
-			embed.setFooter(
-				`${(Math.ceil(absentees / 25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(data.failed.length) ? ", ❗Show failed" : ""}
-				\npage 1 of ${Math.ceil(absentees / 25)}`);
-			message.embeds = [embed];
-			await interaction.followUp(message);
-		});
+		message.addPage(embed);
+		message.addPage(new Embed(
+			"Absences Copy List:",
+			`The following ${absentees} people have been absent for ${days}+ days.\nDuration absent hidden for easy copying.\n\n**${absenteeNames}**`
+		));
+
+		if (AbsenteeData.failed.length) {
+			const failedEmbed = new Embed(
+				"Failed:",
+				"Failed to fetch data for the following players. This is likely due to these players changing their names while in the guild."
+			);
+			failedEmbed.setColor(config.colors.embed.error);
+			for (const i of AbsenteeData.failed) {
+				failedEmbed.addField("\u200b", `[**${Util.escapeItalic(i)}**](https://namemc.com/search?q=${i} "See name history")`);
+			}
+			message.addPage(failedEmbed);
+		}
+		//! Failed players should have clock reaction to return to absences (if more than ~5 have failed it is likely the api has been pinged too many times)
+		// embed.setFooter(
+		// 	`${(Math.ceil(absentees / 25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(AbsenteeData.failed.length) ? ", ❗Show failed" : ""}
+		// 	\npage 1 of ${Math.ceil(absentees / 25)}`);
+
+		const msg = await interaction.followUp(message);
+		message.watchMessage(msg);
 	}
 };
 
@@ -118,6 +142,6 @@ function daysSince(timeString) {
 	}
 	const milliseconds =
 		new Date() - new Date(time[0], time[1] - 1, time[2], time[3], time[4], time[5], time[6]);
-	//i 84 400 000 milliseconds per day
+	//info 84 400 000 milliseconds per day
 	return Math.floor(milliseconds / 86400000);
 }

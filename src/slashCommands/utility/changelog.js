@@ -2,7 +2,7 @@ const path = require("path");
 const config = require(path.join(__dirname, "../../config.json"));
 const pkg = require(path.join(__dirname, "../../../package.json"));
 const { readdirSync, readFileSync } = require("fs");
-const { MessageEmbed } = require("discord.js");
+const Embed = require("../../utility/Embed");
 
 const logsPath = path.join(__dirname, "../../../changelogs");
 const versions = readdirSync(logsPath);
@@ -25,18 +25,18 @@ module.exports = {
 		required: true,
 		choices: choices
 	}],
-	perms: ["ADMINISTRATOR"],
+	perms: ["MANAGE_GUILD"],
 
 	async execute(interaction) {
 		const version = interaction.options.getString("version");
 
-		const changelog = new MessageEmbed();
+		const changelog = new Embed(
+			`Version ${version} changelog:`,
+			readFileSync(`${logsPath}/${version}.txt`).toString()
+		);
 
-		changelog.setTitle(`Version ${version} changelog:`);
-		changelog.setDescription(readFileSync(`${logsPath}/${version}.txt`).toString());
 		changelog.setAuthor(`Current version: ${pkg.version}`, interaction.client.user.avatarURL());
 
-		changelog.setColor(config.colors.embed.default);
 		await interaction.followUp({embeds: [changelog]});
 	}
 };

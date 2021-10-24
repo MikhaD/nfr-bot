@@ -11,7 +11,7 @@ module.exports = {
 		required: true
 	}],
 	async execute(interaction) {
-		//i ######## combine groups of args that start and end in inverted commas into single args #######
+		//info ######## combine groups of args that start and end in inverted commas into single args ########
 		let comma = "";
 		let args = [];
 		let str = "";
@@ -40,7 +40,7 @@ module.exports = {
 		}
 		if (str !== "") args.push(str);
 
-		//i ############################# choose and return a random argument ############################
+		//info ############################# choose and return a random argument #############################
 		await interaction.followUp(`${args[[randint(args.length)]]}`);
 	}
 };

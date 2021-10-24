@@ -1,5 +1,5 @@
-const path = require("path");
-const { createWarnEmbed, createSuccessEmbed } = require(path.join(__dirname, "../../utility/utility"));
+const SuccessEmbed = require("../../utility/SuccessEmbed");
+const WarnEmbed = require("../../utility/WarnEmbed");
 
 module.exports = {
 	name: "purge",
@@ -39,24 +39,24 @@ module.exports = {
 
 		if (totalDeleted === messages) {
 			if (ephemeral) {
-				await interaction.followUp({embeds: [createSuccessEmbed(
+				await interaction.followUp({embeds: [new SuccessEmbed(
 					`${messages} message${(messages !== 1) ? "s" : ""} deleted from #${interaction.channel.name}`,
 					""
 				)]});
 			} else {
-				await interaction.channel.send({embeds: [createSuccessEmbed(
+				await interaction.channel.send({embeds: [new SuccessEmbed(
 					`${messages - 1} message${(messages !== 2) ? "s" : ""} deleted from #${interaction.channel.name}`,
 					"Use `ephemeral: true` to not show this message"
 				)]});
 			}
 		} else if (totalDeleted !== messages) {
 			if (ephemeral) {
-				await interaction.followUp({embeds: [createWarnEmbed(
+				await interaction.followUp({embeds: [new WarnEmbed(
 					`${totalDeleted} of ${messages} messages deleted`,
 					"Messages over 2 weeks old are unable to be deleted"
 				)]});
 			} else {
-				await interaction.channel.send({embeds: [createWarnEmbed(
+				await interaction.channel.send({embeds: [new WarnEmbed(
 					`${totalDeleted - 1} of ${messages - 1} messages deleted`,
 					"Messages over 2 weeks old are unable to be deleted"
 				)]});

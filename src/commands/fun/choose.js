@@ -14,7 +14,7 @@ module.exports = {
 		if (!args.length) {
 			msg.channel.send(`You didn't specify any options to choose from, so I choose you ${msg.author}`);
 		} else {
-			//i ######## combine groups of args that start and end in inverted commas into single args #######
+			//info ###### combine groups of args that start and end in inverted commas into single args ######
 			let comma = "";
 			let newArgs = [];
 			let str = "";
@@ -43,7 +43,7 @@ module.exports = {
 			}
 			(str !== "") ? newArgs.push(str) : false;
 
-			//i ############################# choose and return a random argument ############################
+			//info ########################### choose and return a random argument ###########################
 			msg.channel.send(newArgs[randint(newArgs.length)]);
 		}
 	}

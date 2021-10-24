@@ -50,7 +50,7 @@ module.exports = {
 				embed.addField("Profession Total:", spaceNumber(player.global.totalLevel.profession), true);
 
 				embed.addField("\u200b", "\u200b");
-				//i For why the playtime is multiplied by 4.7 check https://github.com/Wynncraft/WynncraftAPI/issues/56
+				//info For why the playtime is multiplied by 4.7 check https://github.com/Wynncraft/WynncraftAPI/issues/56
 				embed.addField("Playtime:", asHours(Math.floor(player.meta.playtime * 4.7)), true);
 				embed.addField("Logins:", spaceNumber(player.global.logins), true);
 				embed.addField("Deaths:", spaceNumber(player.global.deaths), true);
@@ -86,7 +86,7 @@ module.exports = {
 				str += spaceBetween("Total Level:", spaceNumber(player.global.totalLevel.combined), width) + "\n";
 				str += spaceBetween("Combat Total:", spaceNumber(player.global.totalLevel.combat), width) + "\n";
 				str += spaceBetween("Profession Total:", spaceNumber(player.global.totalLevel.profession), width) + "\n";
-				//i For why the playtime is multiplied by 4.7 check https://github.com/Wynncraft/WynncraftAPI/issues/56
+				//info For why the playtime is multiplied by 4.7 check https://github.com/Wynncraft/WynncraftAPI/issues/56
 				str += spaceBetween("Playtime:", asHours(Math.floor(player.meta.playtime * 4.7)), width) + "\n";
 				str += spaceBetween("Logins:", spaceNumber(player.global.logins), width) + "\n";
 				str += spaceBetween("Deaths:", spaceNumber(player.global.deaths), width) + "\n";
@@ -109,7 +109,7 @@ module.exports = {
 			}
 			msg.channel.send(message);
 		} catch (e) {
-			msg.channel.send({embeds: [createErrorEmbed(`Failed to retrieve player stats for ${args[0]}`, "")]});
+			msg.channel.send({ embeds: [createErrorEmbed(`Failed to retrieve player stats for ${args[0]}`, "")] });
 			console.log(`Error code: ${code}`);
 			console.log(e);
 		}
