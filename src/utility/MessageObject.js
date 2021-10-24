@@ -1,11 +1,13 @@
 const EmbedChapter = require("./EmbedChapter");
-const { MessageButton, MessageActionRow } = require("discord.js");
+const { MessageButton, MessageActionRow, MessageAttachment } = require("discord.js");
 
 module.exports = class MessageObject {
 	constructor(text) {
 		this.pages = new EmbedChapter();
 		this.embeds = [];
 		this.components = [];
+		this.files = [];
+		this.thumbnail = null;
 		this.buttonsTimeout = 300000;
 		if (text) this.content = text;
 	}
@@ -24,9 +26,21 @@ module.exports = class MessageObject {
 		}
 	}
 
-	setMessage(message) {
-		this.message = message;
+	/**
+	 * Set the thumbnail for all embeds added to and in this message
+	 * @param {MessageAttachment | string} thumbnail - The MessageAttachment object for the thumbnail, or the URL to the thumbnail image
+	 */
+	setThumbnail(thumbnail) {
+		if (typeof thumbnail === "string") {
+			this.thumbnail = thumbnail;
+		} else {
+			this.thumbnail = `attachment://${thumbnail.name}`;
+			this.files.push(thumbnail);
+		}
+		this.pages.setThumbnail(this.thumbnail);
+	}
 
+	watchMessage(message) {
 		const collector = message.channel.createMessageComponentCollector({ componentType: "BUTTON", time: this.buttonsTimeout, message });
 		collector.on("collect", async (btnInteraction) => {
 			btnInteraction.deferUpdate();

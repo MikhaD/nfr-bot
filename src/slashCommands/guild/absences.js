@@ -1,6 +1,7 @@
 const path = require("path");
-const { MessageAttachment, Util, MessageEmbed } = require("discord.js");
+const { MessageAttachment, Util } = require("discord.js");
 const Embed = require("../../utility/Embed");
+const MessageObject = require("../../utility/MessageObject");
 const config = require(path.join(__dirname, "../../config.json"));
 const { createErrorEmbed, fetchPlayer, fetchGuild, createBannerImage } = require(path.join(__dirname, "../../utility/utility"));
 
@@ -42,21 +43,19 @@ module.exports = {
 		}
 		//info Start fetching player data
 		let AbsenteeData = getAbsenteeData(guild.members);
-		const embed = new Embed(`${guildName} Absences:`, "");
+		const embed = new Embed(`${guildName} Absences:`, "", true);
 
 		//info Start generating guild banner if guild has a banner
-		let banner = createBannerImage(guild.banner);
+		// let banner = createBannerImage(guild.banner);
 
 		AbsenteeData = await AbsenteeData;
 		//info Add banner image to embed if guild has banner
-		const message = embed.getMessageOptionsObject(true, true);
-		banner = await banner;
-		if (banner) {
-			const attachmentName = "banner.png";
-			const attachment = new MessageAttachment(banner, attachmentName);
-			message.files = [attachment];
-			embed.setThumbnail(`attachment://${attachmentName}`);
-		}
+		const message = new MessageObject();
+		// banner = await banner;
+		// if (banner) {
+		// message.setThumbnail(new MessageAttachment(banner, "banner.png"));
+		message.setThumbnail(`${config.guildBannerUrl}${guildName.replaceAll(" ", "%20")}`);
+		// }
 
 		let absentees = 0;
 		let absenteeNames = "";
@@ -69,30 +68,32 @@ module.exports = {
 				absenteeNames += `${Util.escapeItalic(i[0])}\n`;
 			}
 		}
-		embed.addPage("Hide Times", new Embed(
-			`${guildName} Absences:`,
-			`The following ${absentees} people have been absent for ${days}+ days. Duration absent hidden for easy copying.\n\n**${absenteeNames}**`
-		));
 		embed.setDescription(`The following ${absentees} people have been absent for ${days}+ days`);
+
+		message.addPage(embed);
+		message.addPage(new Embed(
+			"Absences Copy List:",
+			`The following ${absentees} people have been absent for ${days}+ days.\nDuration absent hidden for easy copying.\n\n**${absenteeNames}**`
+		));
 
 		if (AbsenteeData.failed.length) {
 			const failedEmbed = new Embed(
 				"Failed:",
 				"Failed to fetch data for the following players. This is likely due to these players changing their names while in the guild."
 			);
-			embed.addPage("Failed", failedEmbed);
 			failedEmbed.setColor(config.colors.embed.error);
 			for (const i of AbsenteeData.failed) {
 				failedEmbed.addField("\u200b", `[**${Util.escapeItalic(i)}**](https://namemc.com/search?q=${i} "See name history")`);
 			}
+			message.addPage(failedEmbed);
 		}
 		//! Failed players should have clock reaction to return to absences (if more than ~5 have failed it is likely the api has been pinged too many times)
-		embed.setFooter(
-			`${(Math.ceil(absentees / 25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(AbsenteeData.failed.length) ? ", ❗Show failed" : ""}
-			\npage 1 of ${Math.ceil(absentees / 25)}`);
+		// embed.setFooter(
+		// 	`${(Math.ceil(absentees / 25) > 1) ? "◀️Previous, ▶️Next, " : ""}📄Hide days${(AbsenteeData.failed.length) ? ", ❗Show failed" : ""}
+		// 	\npage 1 of ${Math.ceil(absentees / 25)}`);
 
 		const msg = await interaction.followUp(message);
-		embed.setMessageObject(msg);
+		message.watchMessage(msg);
 	}
 };
 
