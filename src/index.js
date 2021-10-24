@@ -54,7 +54,7 @@ client.on("interactionCreate", async interaction => {
 			if (command) {
 				//info check if user has permission to use that command
 				//! Discord API currently doesn't allow setting of permissions for discord perms for slash commands, only roles. This means the commands will be visible to people who can't use them https://github.com/discord/discord-api-docs/discussions/3581
-				if (command.dev && interaction.member.id !== config.developer_id) {
+				if (command.category === "dev" && interaction.member.id !== config.developer_id) {
 					return interaction.reply({ content: `⛔ /${command.name} is a developer command, you may not use it`, ephemeral: true });
 				}
 				if (command.perms) {
