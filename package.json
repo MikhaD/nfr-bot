@@ -8,6 +8,9 @@
     "type": "git",
     "url": "https://github.com/MikhaD/nfr-bot"
   },
+  "engines": {
+    "node": "16.x"
+  },
   "license": "ISC",
   "private": "true",
 

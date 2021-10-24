@@ -1,7 +1,7 @@
 const { readdirSync } = require("fs");
 const path = require("path");
 const Discord = require("discord.js");
-const { ErrorEmbed } = require("./utility/Embed");
+const { ErrorEmbed } = require(path.join(__dirname, "./utility/Embed"));
 const config = require(path.join(__dirname, "./config.json"));
 const { parsePermissions } = require(path.join(__dirname, "./utility/utility.js"));
 

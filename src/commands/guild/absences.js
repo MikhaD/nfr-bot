@@ -69,10 +69,11 @@ module.exports = {
 		));
 
 		if (AbsenteeData.failed.length) {
-			const failedEmbed = new ErrorEmbed(
+			const failedEmbed = new Embed(
 				"Failed:",
 				"Failed to fetch data for the following players. This is likely due to these players changing their names while in the guild."
 			);
+			failedEmbed.setColor(config.colors.embed.error);
 			for (const i of AbsenteeData.failed) {
 				failedEmbed.addField("\u200b", `[**${Util.escapeItalic(i)}**](https://namemc.com/search?q=${i} "See name history")`);
 			}
