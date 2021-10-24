@@ -1,51 +1,42 @@
 const path = require("path");
-const { createErrorEmbed } = require(path.join(__dirname, "../../utility/_utility"));
 const pkg = require(path.join(__dirname, "../../../package.json"));
 const { readdirSync, readFileSync } = require("fs");
-const { MessageEmbed } = require("discord.js");
+const { Embed } = require("../../utility/Embed");
+
+const logsPath = path.join(__dirname, "../../../changelogs");
+const versions = readdirSync(logsPath);
+const choices = [];
+
+for (const version of versions.reverse()) {
+	choices.push({
+		name: `${version.slice(0, -4)}`,
+		value: `${version.slice(0, -4)}`
+	});
+}
 
 module.exports = {
 	name: "changelog",
-	args: {
-		optional: ["version"]
-	},
-	description: "Display the list of changes for a given version. For the latest changelog don't specify a version",
-	example: "changelog",
-	cooldown: 3,
-	permissions: ["ADMINISTRATOR"],
+	description: "Display the list of changes for a given version, latest by default",
+	cooldown: 5,
+	perms: ["MANAGE_GUILD"],
+	options: [{
+		name: "version",
+		type: "STRING",
+		description: "the version you wish to display the changelog for",
+		required: true,
+		choices: choices
+	}],
 
-	execute(msg, args) {
-		const logsPath = path.join(__dirname, "../../../changelogs");
-		const versions = readdirSync(logsPath);
-		const changelog = new MessageEmbed();
-		if (args.length > 0) {
-			if (versions.includes(`${args[0]}.txt`)) {
-				changelog.setTitle(`Version ${args[0]} changelog:`);
-				changelog.setDescription(readFileSync(`${logsPath}/${args[0]}.txt`).toString());
-				changelog.setAuthor(`Current version: ${pkg.version}`);
-			} else {
-				msg.channel.send(createErrorEmbed("", `${args[0]} is not a valid version number`));
-				return;
-			}
-		} else {
-			for (const version of versions.sort(s)) {
-				changelog.addField(`Version ${version.slice(0, -4)} changelog:`, readFileSync(`${logsPath}/${version}`).toString());
-			}
-		}
-		changelog.setThumbnail(msg.client.user.avatarURL());
-		msg.channel.send(changelog);
-	}
-};
+	async execute(interaction) {
+		const version = interaction.options.getString("version");
 
-let s = function(a, b) {
-	const result = [0, 0];
-	const input = [a, b];
-	for (let i = 0; i < input.length; ++i) {
-		input[i] = input[i].slice(0, -4).split(".").map(j => parseInt(j));
-		while (input[i].length < 3) {input[i].push(0);}
-		for (let k = 0; k < input[i].length; ++k) {
-			result[i] += input[i][k] * 10**(input[i].length - (k + 1));
-		}
+		const changelog = new Embed(
+			`Version ${version} changelog:`,
+			readFileSync(`${logsPath}/${version}.txt`).toString()
+		);
+
+		changelog.setAuthor(`Current version: ${pkg.version}`, interaction.client.user.avatarURL());
+
+		await interaction.followUp({embeds: [changelog]});
 	}
-	return result[1] - result[0];
 };

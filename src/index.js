@@ -1,95 +1,104 @@
-global.path = __dirname;
-
 const { readdirSync } = require("fs");
 const path = require("path");
 const Discord = require("discord.js");
+const { ErrorEmbed } = require("./utility/Embed");
 const config = require(path.join(__dirname, "./config.json"));
-const { createErrorEmbed, parsePermissions } = require(path.join(__dirname, "./utility/_utility.js"));
+const { parsePermissions } = require(path.join(__dirname, "./utility/utility.js"));
 
-const client = new Discord.Client({partials: ["MESSAGE", "REACTION"]});
+const client = new Discord.Client({
+	partials: ["MESSAGE", "REACTION", "CHANNEL"],
+	intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES", "DIRECT_MESSAGE_REACTIONS"]
+});
 client.cooldowns = new Discord.Collection();
 const { cooldowns } = client;
 
-//i ############ get all commands from file and set them as properties of the client object (bot) ############
+//info ########### get all slash commands from file and set them as properties of the client object ##########
+let helpData = {
+	choices: []
+};
 client.commands = new Discord.Collection();
 //match dirs that don't start with _
 for (const dir of readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.test(dir))) {
 	//match files that end in .js and don't start with _
 	for (const file of readdirSync(`${__dirname}/commands/${dir}`).filter(file => /^[^_].*\.js$/.test(file))) {
 		const command = require(`./commands/${dir}/${file}`);
+		command.category = dir;
 		client.commands.set(command.name, command);
+		if (command.category !== "dev") helpData.choices.push({name: `/${command.name}`, value: command.name});
 	}
 }
+client.commands.get("help").options[0].choices = helpData.choices;
 
-//i ########################## Send a message to console when the bot has logged in ##########################
-client.once("ready", () => {
-	client.user.setActivity(`${config.prefix}help`, { type: "PLAYING" });
+//info ############################################ On bot log in ############################################
+client.once("ready", async () => {
+	client.user.setActivity("/help", { type: "PLAYING" });
+	//! Register slash commands globally for release version
+	client.appCmdManager = client.application.commands;
+	// client.appCmdManager = client.guilds.cache.get(config.dev_guild_id).commands;
+	await client.appCmdManager.set(Array.from(client.commands, el => el[1]));
+
 	console.log(`${client.user.tag} has logged in.`);
 });
 
-//i ############################################# Handle commands ############################################
-client.on("message", async (msg) => {
+//info ########################################### Handle commands ###########################################
+client.on("messageCreate", async (msg) => {
 	if (msg.author.bot || !msg.content.startsWith(config.prefix)) return;
-	let [cmd, ...args] = msg.content.slice(config.prefix.length).split(/\s+/);
-	cmd = cmd.toLowerCase();
-
-	const command = client.commands.get(cmd) || client.commands.find(i => i.aliases && i.aliases.includes(cmd)); //i get command & check aliases if not a command
-	if (command) {
-		if ((msg.channel.type === "dm" && command.serverOnly)) {
-			msg.channel.send(createErrorEmbed("Incorrect command context", `${command.name} can only be used in servers`));
-			return;
-		}
-		//i check if user has permission to use that command
-		if (command.permissions) {
-			const authorPerms = msg.channel.permissionsFor(msg.author);
-			if (!authorPerms || !authorPerms.has(command.permissions)) {
-				const errorEmbed = createErrorEmbed("Inadeqate Permissions", `You do not have adequate permissions to use \`${cmd}\` here.`);
-				errorEmbed.addField(`${cmd} requires:`, parsePermissions(command.permissions));
-				msg.channel.send(errorEmbed);
-				return;
-			}
-		}
-
-		//i cooldown
-		if (!cooldowns.has(command.name)) {
-			cooldowns.set(command.name, new Discord.Collection());
-		}
-		const now = Date.now();
-		const timestamps = cooldowns.get(command.name);
-		const cooldown = (command.cooldown || config.default_cooldown) * 1000;
-
-		if (timestamps.has(msg.author.id)) {
-			const expirationTime = timestamps.get(msg.author.id) + cooldown;
-			if (now < expirationTime) return;
-		}
-		timestamps.set(msg.author.id, now);
-		setTimeout(() => timestamps.delete(msg.author.id), cooldown);
-
-		//i ensure commands with required arguments have at least that many arguments
-		if (command.args.required && command.args.required.length > args.length) {
-			client.commands.get("help").execute(msg, [cmd]);
-			return;
-		}
-
-		//i try to execute command
-		try {
-			msg.channel.startTyping();
-			await command.execute(msg, args);
-		} catch (e) {
-			msg.channel.send(createErrorEmbed("Unable to execute command"), `Error:\n\`${e}\``);
-		}
-	} else {
-		msg.channel.send(createErrorEmbed(
-			`${config.prefix}${cmd} is not a recognised command`,
-			`Try ${config.prefix}help for a list of commands`
-		));
-	}
-
-	msg.channel.stopTyping();
+	msg.reply({content: `${config.prefix} commands are depricated, use / instead. Do /help for help`, ephemeral: true});
 });
 
-//i ############################################ Bring bot online ############################################
-//i load all env variables in .env file
+client.on("interactionCreate", async interaction => {
+	//info Check its from a slash command as things like buttons and drop downs also create these events
+	if (interaction.isCommand()) {
+		try {
+			const command = client.commands.get(interaction.commandName);
+			if (command) {
+				//info check if user has permission to use that command
+				//! Discord API currently doesn't allow setting of permissions for discord perms for slash commands, only roles. This means the commands will be visible to people who can't use them https://github.com/discord/discord-api-docs/discussions/3581
+				if (command.category === "dev" && interaction.member.id !== config.developer_id) {
+					return interaction.reply({ content: `⛔ /${command.name} is a developer command, you may not use it`, ephemeral: true });
+				}
+				if (command.perms) {
+					const authorPerms = interaction.channel.permissionsFor(interaction.member);
+					if (!authorPerms || !authorPerms.has(command.perms)) {
+						return interaction.reply({ content: `⛔ ${parsePermissions(command.perms)} is required to use this command`, ephemeral: true });
+					}
+				}
+				//info cooldown
+				if (command.cooldown) {
+					if (!cooldowns.has(command.name)) {
+						cooldowns.set(command.name, new Discord.Collection());
+					}
+					const now = Date.now();
+					const timestamps = cooldowns.get(command.name);
+					const cooldown = command.cooldown * 1000;
+
+					if (timestamps.has(interaction.member.id)) {
+						const expirationTime = timestamps.get(interaction.member.id) + cooldown;
+						if (now < expirationTime) {
+							return interaction.reply({ content: `🕙 You can only use this command once every ${command.cooldown} seconds,\nyou have ${Math.round((expirationTime - now)/1000)} seconds until you can use it again`, ephemeral: true });
+						}
+					}
+					timestamps.set(interaction.member.id, now);
+					setTimeout(() => timestamps.delete(interaction.member.id), cooldown);
+				}
+				//info
+				if (interaction.options.getBoolean("ephemeral") || command.ephemeral) {
+					await interaction.deferReply({ ephemeral: true });
+				} else {
+					await interaction.deferReply(); // by deferring we have 15m to respond, but cannot use reply on the interaction, only followUp and editReply
+				}
+				await command.execute(interaction);
+			}
+		} catch (e) {
+			console.log(e);
+			const err = new ErrorEmbed("Failed to execute command", e);
+			await interaction.followUp({ embeds: [err], ephemeral: true });
+		}
+	}
+});
+
+//info ########################################### Bring bot online ##########################################
+//info load all env variables in .env file
 require("dotenv").config();
-//i log in
+//info log in
 client.login(process.env.TOKEN);

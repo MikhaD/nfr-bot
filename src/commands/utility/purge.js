@@ -1,57 +1,66 @@
-const path = require("path");
-const config = require(path.join(__dirname, "../../config.json"));
-const { createErrorEmbed, createWarnEmbed } = require(path.join(__dirname, "../../utility/_utility"));
-const { MessageEmbed } = require("discord.js");
+const { SuccessEmbed, WarnEmbed } = require("../../utility/Embed");
 
 module.exports = {
 	name: "purge",
-	aliases: ["prune"],
-	args: {
-		required: ["messages"],
-		optional: ["hide success msg"]
-	},
-	description: "Delete <messages> number of messages.",
-	example: "purge 15 true",
-	serverOnly: true,
+	description: "Delete a given number of messages from this channel",
 	cooldown: 5,
-	permissions: ["ADMINISTRATOR"],
+	perms: ["ADMINISTRATOR"],
+	options: [{
+		name: "messages",
+		type: "INTEGER",
+		description: "The number of messages to delete",
+		required: true
+	},
+	{
+		name: "ephemeral",
+		type: "BOOLEAN",
+		description: "Don't show the success message",
+		required: false
+	}],
 
-	async execute(msg, args) {
-		if (!isNaN(args[0])) {
-			//i +1 one to also delete the message with the command
-			const messages = Math.round(parseInt(args[0])) + 1;
-			if (messages < 2) {
-				msg.channel.send(createErrorEmbed("Invalid number of messages", "You must purge at least 1 or more messages."));
-				return;
+	async execute(interaction) {
+		const ephemeral = interaction.options.getBoolean("ephemeral");
+		const messages = interaction.options.getInteger("messages") + !ephemeral;
+
+		if (messages < 1) return;
+		const hundreds = Math.floor(messages / 100);
+		const remainder = messages % 100;
+
+		let totalDeleted = 0;
+
+		if (remainder > 0) {
+			const e = await interaction.channel.bulkDelete(remainder, true);
+			totalDeleted += e.size;
+		}
+		for (let i = 0; i < hundreds; ++i) {
+			const e = await interaction.channel.bulkDelete(100, true);
+			totalDeleted += e.size;
+		}
+
+		if (totalDeleted === messages) {
+			if (ephemeral) {
+				await interaction.followUp(new SuccessEmbed(
+					`${messages} message${(messages !== 1) ? "s" : ""} deleted from #${interaction.channel.name}`,
+					""
+				));
+			} else {
+				await interaction.channel.send(new SuccessEmbed(
+					`${messages - 1} message${(messages !== 2) ? "s" : ""} deleted from #${interaction.channel.name}`,
+					"Use `ephemeral: true` to not show this message"
+				));
 			}
-
-			const hundreds = Math.floor(messages / 100);
-			const remainder = messages % 100;
-
-			let totalDeleted = 0;
-
-			if (remainder > 0) {
-				const e = await msg.channel.bulkDelete(remainder, true);
-				totalDeleted += e.size;
+		} else if (totalDeleted !== messages) {
+			if (ephemeral) {
+				await interaction.followUp(new WarnEmbed(
+					`${totalDeleted} of ${messages} messages deleted`,
+					"Messages over 2 weeks old are unable to be deleted"
+				));
+			} else {
+				await interaction.channel.send(new WarnEmbed(
+					`${totalDeleted - 1} of ${messages - 1} messages deleted`,
+					"Messages over 2 weeks old are unable to be deleted"
+				));
 			}
-			for (let i = 0; i < hundreds; ++i) {
-				const e = await msg.channel.bulkDelete(100, true);
-				totalDeleted += e.size;
-			}
-
-			if ((args.length < 2 || args[1].toLowerCase() !== "true") && totalDeleted === messages) {
-				const successEmbed = new MessageEmbed()
-					.setColor(config.colors.embed.success)
-					.setTitle(`${messages - 1} message${(messages !== 2) ? "s" : ""} deleted from #${msg.channel.name}`)
-					.setDescription(`Use \`${config.prefix}${this.name} <number of messages> true\` to not show this message`);
-
-				msg.channel.send(successEmbed);
-			} else if (totalDeleted !== messages) {
-				msg.channel.send(
-					createWarnEmbed(`${totalDeleted - 1} of ${messages - 1} messages deleted`, "Messages over 2 weeks old are unable to be deleted"));
-			}
-		} else {
-			msg.client.commands.get("help").execute(msg, [this.name]);
 		}
 	}
 };

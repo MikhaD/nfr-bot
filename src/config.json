@@ -1,15 +1,17 @@
 {
 	"prefix": "\\",
-	"default_cooldown": 0,
+	"developer_id": "420905576508293132",
 	"default_guild": "Nefarious Ravens",
 	"min_days": 7,
 	"defualt_dice": 6,
+	"dev_guild_id": "843909132359958618",
+	"guildBannerUrl": "https://wynn-guild-banner.herokuapp.com/banners/",
 	"colors": {
 		"embed": {
-			"default": "#980F91",
-			"error": "#FF5555",
-			"warn": "#FE9713",
-			"success": "#24A400"
+			"default": "#992699",
+			"error": "#B52424",
+			"warn": "#E38024",
+			"success": "#339020"
 		},
 		"tag": {
 			"null": "#C4AB79",

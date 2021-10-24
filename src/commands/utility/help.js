@@ -1,49 +1,57 @@
-const path = require("path");
-const config = require(path.join(__dirname, "../../config.json"));
-const { createErrorEmbed, createSimpleEmbed, parseArguments, parsePermissions } = require(path.join(__dirname, "../../utility/_utility"));
-
+const { Embed } = require("../../utility/Embed");
+const MessageObject = require("../../utility/MessageObject");
+const { parseArguments, parsePermissions } = require("../../utility/utility");
 
 module.exports = {
 	name: "help",
-	aliases: ["commands"],
-	args: {
-		optional: ["command"]
-	},
-	description: "Show the help menu, or help info for a command.",
-	example: "help absences",
-	cooldown: 2,
+	description: "Show the help menu, or help info for a command",
+	options: [{
+		name: "command",
+		type: "STRING",
+		description: "The command you want help with",
+		required: false
+	}],
 
-	execute(msg, args) {
-		const { commands } = msg.client;
-		if (args.length) {
-			const command = commands.get(args[0].toLowerCase()) || commands.find(i => i.aliases && i.aliases.includes(args[0].toLowerCase()));
-			if (command) {
-				const helpEmbed = createSimpleEmbed(`${config.prefix}${command.name} ${parseArguments(command)}`, command.description);
-				//i Permissions
-				if (command.permissions) helpEmbed.addField("Permissions:", parsePermissions(command.permissions));
-				//i Example
-				if (command.example) helpEmbed.addField("Example:", `${config.prefix}${command.example}`);
-				//i Aliases
-				if (command.aliases) {
-					let aliasString = "";
-					for (const alias of command.aliases) {
-						aliasString += (args[0].toLowerCase() === alias) ? `**${alias}**, ` : `${alias}, `;
-					}
-					helpEmbed.addField("Aliases:", aliasString.slice(0, -2));
+	async execute(interaction) {
+		const cmd = interaction.options.getString("command");
+		if (cmd) {
+			const command = interaction.client.commands.get(cmd);
+			const embed = new Embed(`/${command.name} help`, command.description);
+			//info Syntax
+			let syntax = `\`/${command.name}${parseArguments(command)}\`\n`;
+			if (command.options) {
+				for (const option of command.options) {
+					// description, required, options
+					syntax += `\`${option.name}\`: ${option.description}
+					required: ${option.required}
+					${(option.choices ? "choices: " + option.choices.reduce((str, c) => `${str}, ${c.name}`, "\b").slice(2) + "\n": "")}`;
 				}
-				//i Cooldown
-				helpEmbed.addField("Cooldown:", `${(command.cooldown) ? command.cooldown : config.default_cooldown} seconds`);
-				msg.channel.send(helpEmbed);
-			} else {
-				msg.channel.send(createErrorEmbed(`${config.prefix}${command} is not a valid command`, `Type \`${config.prefix}help\` to see the list of commands.`));
 			}
+			embed.addField("Syntax", syntax);
+			//info Permissions
+			if (command.perms) embed.addField("Permissions", parsePermissions(command.perms));
+			//info Cooldown
+			if (command.cooldown) embed.addField("Cooldown", `${command.cooldown} seconds`);
+			//info Catgory
+			embed.setFooter(`\ncommand category: ${command.category}`);
+
+			await interaction.followUp(embed);
 		} else {
-			const helpEmbed = createSimpleEmbed("Command Help", `Call ${config.prefix}help on a specific command for more information about it.`);
-			for (const cmd of commands) {
-				helpEmbed.addField(`${config.prefix}${cmd[0]} ${parseArguments(cmd[1])}`, cmd[1].description);
+			const message = new MessageObject();
+			const categories = new Map();
+			for (const cmd of interaction.client.commands) {
+				if (cmd[1].category !== "dev") {
+					if (!categories.get(cmd[1].category)) {
+						categories.set(cmd[1].category, new Embed(`${cmd[1].category} commands`));
+					}
+					categories.get(cmd[1].category).addField(`/${cmd[0]} ${parseArguments(cmd[1])}`, cmd[1].description);
+				}
 			}
-			helpEmbed.setFooter(`Page 1 of ${Math.ceil(commands.size / 25)}`);
-			msg.channel.send(helpEmbed);
+			for (const embed of categories.values()) {
+				message.addPage(embed);
+			}
+			const msg = await interaction.followUp(message);
+			message.watchMessage(msg);
 		}
-	},
+	}
 };

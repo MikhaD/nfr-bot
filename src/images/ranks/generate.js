@@ -1,7 +1,7 @@
 const path = require("path");
 const { writeFileSync } = require("fs");
 const { loadImage, createCanvas } = require("canvas");
-const { Color } = require(path.join(__dirname, "../../utility/_utility"));
+const { Color } = require(path.join(__dirname, "../../utility/utility"));
 
 const wynndataColor = {
 	"VIP": "#009B00",
@@ -45,7 +45,7 @@ async function recolor(color, rank) {
 }
 
 (async () => {
-	//i Change this variable to change the color scheme
+	//info Change this variable to change the color scheme
 	const color = wynndataColor;
 	for (const i in color) {
 		await recolor(color[i], i);
