@@ -2,5 +2,7 @@ node_modules/
 .env
 package-lock.json
 testing.js
-src/commands/dev/
+dist/commands/dev/
 *.xlsx
+src js/
+todo.md

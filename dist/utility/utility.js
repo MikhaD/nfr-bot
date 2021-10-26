@@ -108,7 +108,7 @@ module.exports.createBannerImage = async function(data) {
 			const tempCanv = createCanvas(width, height);
 			const tempCtx = tempCanv.getContext("2d");
 			tempCtx.imageSmoothingEnabled = false;
-			const img = await loadImage(`./src/images/banners/patterns/${layer.pattern.toLowerCase()}.png`);
+			const img = await loadImage(`./dist/images/banners/patterns/${layer.pattern.toLowerCase()}.png`);
 			tempCtx.drawImage(img, 0, 0, width, height);
 
 			const imgData = tempCtx.getImageData(0, 0, width, height);
@@ -171,7 +171,7 @@ module.exports.createRankImage = async function(uuid, rank) {
 
 		ctx.drawImage(await img, 0, 0);
 		if (["CHAMPION", "HERO", "VIP+", "VIP"].includes(rank)) {
-			ctx.drawImage(await loadImage(`./src/images/ranks/${rank}.png`), 0, size + 10);
+			ctx.drawImage(await loadImage(`./dist/images/ranks/${rank}.png`), 0, size + 10);
 		}
 
 		// writeFileSync("./test.png", canvas.toBuffer());
