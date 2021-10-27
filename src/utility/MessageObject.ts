@@ -1,18 +1,24 @@
-const EmbedChapter = require("./EmbedChapter");
-// eslint-disable-next-line no-unused-vars
-const { MessageButton, MessageActionRow, MessageAttachment } = require("discord.js");
-// eslint-disable-next-line no-unused-vars
-const { Embed } = require("./Embed");
+import EmbedChapter from "./EmbedChapter";
+import { MessageButton, MessageActionRow, MessageEmbed, FileOptions, BufferResolvable, MessageAttachment, Message, MessageEditOptions, MessageOptions } from "discord.js";
+import Embed from "./Embed";
+import { EmbedPages } from "../types";
 
-module.exports = class MessageObject {
-	constructor(text) {
+export default class MessageObject implements MessageEditOptions, MessageOptions {
+	content: string;
+	pages: EmbedChapter;
+	embeds: MessageEmbed[];
+	components: MessageActionRow[];
+	attachments: MessageAttachment[];
+	buttonsTimeout: number;
+	thumbnail?: string;
+
+	constructor(text="") {
+		this.content = text;
 		this.pages = new EmbedChapter();
 		this.embeds = [];
 		this.components = [];
-		this.files = [];
-		this.thumbnail = null;
-		this.buttonsTimeout = 300000;
-		if (text) this.content = text;
+		this.attachments = [];
+		this.buttonsTimeout = 5 * 60 * 1000;
 	}
 
 	/**
@@ -20,7 +26,7 @@ module.exports = class MessageObject {
 	 * @param {Embed | EmbedChapter} page - Either an Embed or an EmbedChapter
 	 * @returns this
 	 */
-	addPage(page) {
+	addPage(page: EmbedPages) {
 		this.pages.addPage(page);
 		if (this.pages.length === 1) {
 			this.embeds.push(this.pages.firstPage());
@@ -33,21 +39,22 @@ module.exports = class MessageObject {
 
 	/**
 	 * Set the thumbnail for all embeds added to and in this message
-	 * @param {MessageAttachment | string} thumbnail - The MessageAttachment object for the thumbnail, or the URL to the thumbnail image
+	 * @param thumbnail - The MessageAttachment object for the thumbnail, or the URL to the thumbnail image
 	 */
-	setThumbnail(thumbnail) {
+	setThumbnail(thumbnail: string | MessageAttachment) {
 		if (typeof thumbnail === "string") {
 			this.thumbnail = thumbnail;
 		} else {
 			this.thumbnail = `attachment://${thumbnail.name}`;
-			this.files.push(thumbnail);
+			this.attachments.push(thumbnail);
 		}
 		this.pages.setThumbnail(this.thumbnail);
 	}
 
-	watchMessage(message) {
+	watchMessage(message: Message) {
 		if (this.pages.length > 1) {
-			const collector = message.channel.createMessageComponentCollector({ componentType: "BUTTON", time: this.buttonsTimeout, message: message });
+			//! is the message option required to make this work properly?
+			const collector = message.channel.createMessageComponentCollector({ componentType: "BUTTON", time: this.buttonsTimeout });
 			collector.on("collect", async (btnInteraction) => {
 				btnInteraction.deferUpdate();
 

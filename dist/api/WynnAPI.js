@@ -1,3 +1,4 @@
-module.exports = class MojangAPI {
-	constructor() {}
+"use strict";
+module.exports = class WynnAPI {
+    constructor() { }
 };
