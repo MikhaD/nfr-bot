@@ -1,6 +1,6 @@
-import { MessageEmbed, MessageOptions } from "discord.js";
+import { HexColorString, MessageEmbed, MessageOptions } from "discord.js";
 import { EmbedPages } from "../types";
-const config = require("../config.json");
+import config from "../config.json";
 
 /** A multi page capable message embed with the default color highlight, cabable of being sent without needing to be wrapped in a MessageOptions object */
 export default class Embed extends MessageEmbed implements EmbedPages, MessageOptions {
@@ -18,7 +18,7 @@ export default class Embed extends MessageEmbed implements EmbedPages, MessageOp
 		super();
 		this.setTitle(`${title}`);
 		this.setDescription(`${description}`);
-		this.setColor(config.colors.embed.default);
+		this.setColor(config.colors.embed.default as HexColorString);
 		this.index = 0;
 		this.fieldCount = 0;
 		this.pages = [this];
@@ -133,7 +133,7 @@ export class SuccessEmbed extends Embed {
 	constructor(title="", description="") {
 		super(title, description);
 
-		this.setColor(config.colors.embed.success);
+		this.setColor(config.colors.embed.success as HexColorString);
 	}
 }
 
@@ -146,7 +146,7 @@ export class WarnEmbed extends Embed {
 	constructor(title="", description="") {
 		super(title, description);
 
-		this.setColor(config.colors.embed.warn);
+		this.setColor(config.colors.embed.warn as HexColorString);
 	}
 }
 
@@ -159,6 +159,6 @@ export class ErrorEmbed extends Embed {
 	constructor(title="", description="") {
 		super(title, description);
 
-		this.setColor(config.colors.embed.error);
+		this.setColor(config.colors.embed.error as HexColorString);
 	}
 }

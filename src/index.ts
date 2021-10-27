@@ -6,6 +6,33 @@ const { ErrorEmbed } = require(path.join(__dirname, "./utility/Embed"));
 const config = require(path.join(__dirname, "./config.json"));
 const { parsePermissions } = require(path.join(__dirname, "./utility/utility.js"));
 
+//   _____                _         _____ _ _            _   
+//  /  __ \              | |       /  __ \ (_)          | |  
+//  | /  \/_ __ ___  __ _| |_ ___  | /  \/ |_  ___ _ __ | |_ 
+//  | |   | '__/ _ \/ _` | __/ _ \ | |   | | |/ _ \ '_ \| __|
+//  | \__/\ | |  __/ (_| | ||  __/ | \__/\ | |  __/ | | | |_ 
+//   \____/_|  \___|\__,_|\__\___|  \____/_|_|\___|_| |_|\__|
+
+const client = new Client({
+	partials: ["MESSAGE", "REACTION", "CHANNEL"],
+	intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES", "DIRECT_MESSAGE_REACTIONS"]
+});
+
+//   _____                      _     _____ _       _           _     
+//  |  ___|                    | |   |  __ \ |     | |         | |    
+//  | |____  ___ __   ___  _ __| |_  | |  \/ | ___ | |__   __ _| |___ 
+//  |  __\ \/ / '_ \ / _ \| '__| __| | | __| |/ _ \| '_ \ / _` | / __|
+//  | |___>  <| |_) | (_) | |  | |_  | |_\ \ | (_) | |_) | (_| | \__ \
+//  \____/_/\_\ .__/ \___/|_|   \__|  \____/_|\___/|_.__/ \__,_|_|___/
+//            | |                                                     
+//            |_| 
+
+export const global = {
+	commands: new Collection<string, Command>(),
+	//! Register slash commands globally for release version
+	// appCmdManager: client.application!.commands
+	appCmdManager: client.guilds.cache.get(config.dev_guild_id)!.commands
+}
 //  _                     _   _____                                           _     
 // | |                   | | /  __ \                                         | |    
 // | |     ___   __ _  __| | | /  \/ ___  _ __ ___  _ __ ___   __ _ _ __   __| |___ 
@@ -13,7 +40,6 @@ const { parsePermissions } = require(path.join(__dirname, "./utility/utility.js"
 // | |___| (_) | (_| | (_| | | \__/\ (_) | | | | | | | | | | | (_| | | | | (_| \__ \
 // \_____/\___/ \__,_|\__,_|  \____/\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|___/
 
-export const commands = new Collection<string, Command>();
 
 const helpChoices: CommandOptionChoice[] = [];
 //match dirs that don't start with _
@@ -22,12 +48,12 @@ for (const dir of readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.
 	for (const file of readdirSync(`${__dirname}/commands/${dir}`).filter(file => /^[^_].*\.js$/.test(file))) {
 		const command = require(`./commands/${dir}/${file}`);
 		command.category = dir;
-		commands.set(command.name, command);
+		global.commands.set(command.name, command);
 		if (command.category !== "dev") helpChoices.push({name: `/${command.name}`, value: command.name});
 	}
 }
 
-const help = commands.get("help");
+const help = global.commands.get("help");
 if (help) {
 	help.options[0].choices = helpChoices;
 }
@@ -41,18 +67,9 @@ if (help) {
 //             __/ |                                                                           
 //            |___/
 
-const client = new Client({
-	partials: ["MESSAGE", "REACTION", "CHANNEL"],
-	intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES", "DIRECT_MESSAGE_REACTIONS"]
-});
-
-
 client.once("ready", async () => {
 	client.user?.setActivity("/help", { type: "PLAYING" });
-	//! Register slash commands globally for release version
-	// const appCmdManager = client.application?.commands;
-	const appCmdManager = client.guilds.cache.get(config.dev_guild_id)?.commands;
-	await appCmdManager?.set(Array.from(commands, el => el[1]));
+	await global.appCmdManager.set(Array.from(global.commands, el => el[1]));
 
 	console.log(`${client.user?.tag} has logged in.`);
 });
@@ -82,7 +99,7 @@ client.on("interactionCreate", async interaction => {
 	// Check interaction is from a slash command; buttons and drop downs also create interactions
 	if (interaction.isCommand()) {
 		try {
-			const command = commands.get(interaction.commandName);
+			const command = global.commands.get(interaction.commandName);
 			if (command && interaction.member instanceof GuildMember) {
 				const id = interaction.member.id;
 				// check if user has permission to use that command
