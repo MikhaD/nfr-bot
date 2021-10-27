@@ -100,7 +100,7 @@ client.on("interactionCreate", async interaction => {
 						return interaction.reply({ content: "⛔ This command is server only and cannot be used in dms or group dms", ephemeral: true });
 					}
 				}
-				// check if the user is on cooldown
+				// check if the user is on cooldown, if this command has a cooldown
 				if (command.cooldowns) {
 					const now = Date.now();
 					const cooldown = command.cooldown * 1000;

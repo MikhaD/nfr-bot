@@ -8,10 +8,10 @@ export type Command = {
 	perms: Permission[],
 	cooldown: number,
 	cooldowns?: Collection<string, number>,
-	options: CommandOption[],
-	execute(interaction: Interaction): void,
-	category?: string, 
 	server?: string,
+	options: CommandOption[],
+	category?: string, 
+	execute(interaction: Interaction): void,
 }
 
 export type CommandOption = {

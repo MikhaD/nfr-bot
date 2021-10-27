@@ -1,15 +1,15 @@
-import { MessageEmbed } from "discord.js";
+import { MessageEmbed, MessageOptions } from "discord.js";
 import { EmbedPages } from "../types";
 const config = require("../config.json");
 
-export default class Embed extends MessageEmbed implements EmbedPages {
+/** A multi page capable message embed with the default color highlight, cabable of being sent without needing to be wrapped in a MessageOptions object */
+export default class Embed extends MessageEmbed implements EmbedPages, MessageOptions {
 	index: number;
 	fieldCount: number;
 	pages: MessageEmbed[];
 	embeds: Embed[];
 	pageNumbersOn: boolean;
 	/**
-	 * Create a new multi page capable message embed with the default color highlight
 	 * @param title - The embed title. `default: ""`
 	 * @param description - The embed description. `default: ""`
 	 * @param pageNumbersOn - Whether or not to enable page numbers. `default: false`
@@ -124,9 +124,9 @@ export default class Embed extends MessageEmbed implements EmbedPages {
 	}
 }
 
+/** Create a new message embed with the success highlight */
 export class SuccessEmbed extends Embed {
 	/**
-	 * Create a new message embed with the success highlight
 	 * @param title - The success message title. `default: ""`
 	 * @param description - The success message description. `default: ""`
 	 */
@@ -137,9 +137,9 @@ export class SuccessEmbed extends Embed {
 	}
 }
 
+/** Create a new message embed with the warning highlight */
 export class WarnEmbed extends Embed {
 	/**
-	 * Create a new message embed with the warning highlight
 	 * @param title - The warning message title. `default: ""`
 	 * @param description - The warning message description. `default: ""`
 	 */
@@ -150,9 +150,9 @@ export class WarnEmbed extends Embed {
 	}
 }
 
+/** Create a new message embed with the error highlight */
 export class ErrorEmbed extends Embed {
 	/**
-	 * Create a new message embed with the error highlight
 	 * @param title - The error message title. `default: ""`
 	 * @param description - The error message description. `default: ""`
 	 */

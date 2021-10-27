@@ -1,89 +1,151 @@
-const EmbedChapter = require("./EmbedChapter");
-// eslint-disable-next-line no-unused-vars
-const { MessageButton, MessageActionRow, MessageAttachment } = require("discord.js");
-// eslint-disable-next-line no-unused-vars
-const { Embed } = require("./Embed");
-
-module.exports = class MessageObject {
-	constructor(text) {
-		this.pages = new EmbedChapter();
-		this.embeds = [];
-		this.components = [];
-		this.files = [];
-		this.thumbnail = null;
-		this.buttonsTimeout = 300000;
-		if (text) this.content = text;
-	}
-
-	/**
-	 * Pages should only be added once they have had all of their own pages added to them, otherwise there will be inconsistancies
-	 * @param {Embed | EmbedChapter} page - Either an Embed or an EmbedChapter
-	 * @returns this
-	 */
-	addPage(page) {
-		this.pages.addPage(page);
-		if (this.pages.length === 1) {
-			this.embeds.push(this.pages.firstPage());
-		}
-		if ((this.pages.length > 1 || page.pages.length > 1) && this.components.length === 0) {
-			this.components = [new MessageActionRow().addComponents(new PrevButton(), new NextButton)];
-		}
-		return this;
-	}
-
-	/**
-	 * Set the thumbnail for all embeds added to and in this message
-	 * @param {MessageAttachment | string} thumbnail - The MessageAttachment object for the thumbnail, or the URL to the thumbnail image
-	 */
-	setThumbnail(thumbnail) {
-		if (typeof thumbnail === "string") {
-			this.thumbnail = thumbnail;
-		} else {
-			this.thumbnail = `attachment://${thumbnail.name}`;
-			this.files.push(thumbnail);
-		}
-		this.pages.setThumbnail(this.thumbnail);
-	}
-
-	watchMessage(message) {
-		if (this.pages.length > 1) {
-			const collector = message.channel.createMessageComponentCollector({ componentType: "BUTTON", time: this.buttonsTimeout, message: message });
-			collector.on("collect", async (btnInteraction) => {
-				btnInteraction.deferUpdate();
-
-				if (btnInteraction.customId === "next") {
-					// next button pressed
-					this.embeds = [this.pages.nextPage()];
-				} else if (btnInteraction.customId === "previous") {
-					// prev button pressed
-					this.embeds = [this.pages.previousPage()];
-				} else {
-					// page button pressed (not yet implemented in this version)
-				}
-				message.edit(this);
-			});
-
-			collector.on("end", async () => {
-				await message.edit({ components: [] });
-			});
-		}
-	}
-};
-
-class NextButton extends MessageButton {
-	constructor() {
-		super();
-		this.setCustomId("next");
-		this.setLabel("Next ►");
-		this.setStyle("SECONDARY");
-	}
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const discord_js_1 = require("discord.js");
+class MessageObject {
+    content;
+    pages;
+    embeds;
+    components;
+    attachments;
+    buttonsTimeout;
+    thumbnail;
+    constructor(text) {
+        if (text)
+            this.content = text;
+        this.pages = new EmbedChapter();
+        this.embeds = [];
+        this.components = [];
+        this.attachments = [];
+        this.buttonsTimeout = 5 * 60 * 1000;
+    }
+    addPage(page) {
+        this.pages.addPage(page);
+        if (this.pages.length === 1) {
+            this.embeds.push(this.pages.firstPage());
+        }
+        if ((this.pages.length > 1 || page.pages.length > 1) && this.components.length === 0) {
+            this.components = [new discord_js_1.MessageActionRow().addComponents(new PrevButton(), new NextButton)];
+        }
+        return this;
+    }
+    setThumbnail(thumbnail) {
+        if (typeof thumbnail === "string") {
+            this.thumbnail = thumbnail;
+        }
+        else {
+            this.thumbnail = `attachment://${thumbnail.name}`;
+            this.attachments.push(thumbnail);
+        }
+        this.pages.setThumbnail(this.thumbnail);
+    }
+    watchMessage(message) {
+        if (this.pages.length > 1) {
+            const collector = message.createMessageComponentCollector({ componentType: "BUTTON", time: this.buttonsTimeout });
+            collector.on("collect", async (btnInteraction) => {
+                btnInteraction.deferUpdate();
+                if (btnInteraction.customId === "next") {
+                    this.embeds = [this.pages.nextPage()];
+                }
+                else if (btnInteraction.customId === "previous") {
+                    this.embeds = [this.pages.previousPage()];
+                }
+                else {
+                }
+                message.edit(this);
+            });
+            collector.on("end", async () => {
+                await message.edit({ components: [] });
+            });
+        }
+    }
 }
-
-class PrevButton extends MessageButton {
-	constructor() {
-		super();
-		this.setCustomId("previous");
-		this.setLabel("◄ Prev");
-		this.setStyle("SECONDARY");
-	}
+exports.default = MessageObject;
+;
+class NextButton extends discord_js_1.MessageButton {
+    constructor() {
+        super();
+        this.setCustomId("next");
+        this.setLabel("Next ►");
+        this.setStyle("SECONDARY");
+    }
+}
+class PrevButton extends discord_js_1.MessageButton {
+    constructor() {
+        super();
+        this.setCustomId("previous");
+        this.setLabel("◄ Prev");
+        this.setStyle("SECONDARY");
+    }
+}
+class EmbedChapter {
+    index;
+    length;
+    pages;
+    level;
+    thumbnail;
+    constructor(...embeds) {
+        for (const embed of embeds) {
+            this.addPage(embed);
+        }
+        this.index = 0;
+        this.length = 0;
+        this.pages = [];
+        this.level = 0;
+    }
+    setThumbnail(url) {
+        this.thumbnail = url;
+        for (const page of this.pages) {
+            page.setThumbnail(this.thumbnail);
+        }
+    }
+    addPage(page) {
+        ++this.length;
+        this.pages.push(page);
+        if (page instanceof EmbedChapter) {
+            page.updateLevel();
+        }
+        if (this.thumbnail)
+            page.setThumbnail(this.thumbnail);
+        return this;
+    }
+    nextPage() {
+        const page = this.pages[this.index].nextPage();
+        if (page === null) {
+            this.index = (this.index + 1) % this.pages.length;
+            if (this.level !== 0 && this.index === 0) {
+                return null;
+            }
+            return this.pages[this.index].firstPage();
+        }
+        return page;
+    }
+    previousPage() {
+        const page = this.pages[this.index].previousPage();
+        if (page === null) {
+            if (this.level !== 0 && this.index === 0) {
+                return null;
+            }
+            this.index = (this.index + this.pages.length - 1) % this.pages.length;
+            return this.pages[this.index].lastPage();
+        }
+        return page;
+    }
+    firstPage() {
+        this.index = 0;
+        return this.pages[0].firstPage();
+    }
+    lastPage() {
+        this.index = this.pages.length - 1;
+        return this.pages.at(-1)?.lastPage() || null;
+    }
+    updateLevel() {
+        if (++this.level >= 4) {
+            throw new RangeError("Maximum number of chapter layers exceeded (4)");
+        }
+        for (const i of this.pages.slice(1)) {
+            if (i instanceof EmbedChapter) {
+                i.updateLevel();
+            }
+        }
+    }
 }

@@ -64,7 +64,7 @@ client.on("interactionCreate", async (interaction) => {
                     const now = Date.now();
                     const cooldown = command.cooldown * 1000;
                     if (command.cooldowns.has(id)) {
-                        const expirationTime = command.cooldowns.get(id) || 0 + cooldown;
+                        const expirationTime = command.cooldowns.get(id) + cooldown;
                         if (now < expirationTime) {
                             return interaction.reply({ content: `🕙 You can only use this command once every ${command.cooldown} seconds,\nyou have ${Math.round((expirationTime - now) / 1000)} seconds until you can use it again`, ephemeral: true });
                         }
