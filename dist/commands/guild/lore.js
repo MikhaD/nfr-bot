@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const discord_js_1 = require("discord.js");
+exports.command = void 0;
 const Embed_1 = __importDefault(require("../../utility/Embed"));
 const MessageObject_1 = __importDefault(require("../../utility/MessageObject"));
 const pages = [
@@ -19,13 +19,12 @@ const pages = [
     "https://media.discordapp.net/attachments/844148161647476756/901946477356650496/page9.png",
     "https://media.discordapp.net/attachments/844148161647476756/901946481802641428/page10.png"
 ];
-exports.default = {
+exports.command = {
     name: "lore",
     description: "The story of how NFR came to be, written by Fate, edited by Hiro & illustrated by MrRussetPotato",
     ephemeral: false,
     perms: [],
     cooldown: 60,
-    cooldowns: new discord_js_1.Collection(),
     server: "739428526431666237",
     options: [],
     async execute(interaction) {

@@ -46,8 +46,9 @@ const helpChoices: CommandOptionChoice[] = [];
 for (const dir of readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.test(dir))) {
 	//match files that end in .js and don't start with _
 	for (const file of readdirSync(`${__dirname}/commands/${dir}`).filter(file => /^[^_].*\.js$/.test(file))) {
-		const command = require(`./commands/${dir}/${file}`);
+		const command: Command = require(`./commands/${dir}/${file}`).command;
 		command.category = dir;
+		if (command.cooldown > 0) command.cooldowns = new Collection<string, number>();
 		global.commands.set(command.name, command);
 		if (command.category !== "dev") helpChoices.push({name: `/${command.name}`, value: command.name});
 	}
@@ -159,4 +160,4 @@ client.on("interactionCreate", async interaction => {
 // load all env variables in .env file
 require("dotenv").config();
 // log in
-client.login(process.env.TOKEN);
+client.login(process.env["TOKEN"]);

@@ -34,7 +34,7 @@ export default class Embed extends MessageEmbed implements EmbedPages, MessageOp
 	 * @param inline - If this field will be displayed inline. `default: false`
 	 * @returns this
 	 */
-	addField(title="\u200b", text="\u200b", inline=false): this {
+	override addField(title="\u200b", text="\u200b", inline=false): this {
 		const maxFields = 25;
 		++this.fieldCount;
 		if (this.fieldCount > 1 && this.fieldCount % maxFields === 1) {
@@ -58,7 +58,7 @@ export default class Embed extends MessageEmbed implements EmbedPages, MessageOp
 	 * @param url - The url of the thumbnail image
 	 * @returns this
 	 */
-	setThumbnail(url: string): this {
+	override setThumbnail(url: string): this {
 		super.setThumbnail(url);
 		for (const page of this.pages.slice(1)) {
 			page.setThumbnail(url);

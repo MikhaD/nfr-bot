@@ -1,5 +1,7 @@
 import Collection from "@discordjs/collection";
-import { CommandInteraction, MessageEmbed } from "discord.js";
+import { CommandInteraction, MessageEmbed, NewsChannel, TextChannel, ThreadChannel } from "discord.js";
+
+export type ServerTextChannel = TextChannel | NewsChannel | ThreadChannel;
 
 export type Command = {
 	name: string,
@@ -11,7 +13,7 @@ export type Command = {
 	server?: string,
 	options: CommandOption[],
 	category?: string, 
-	execute(interaction: CommandInteraction): void,
+	execute(interaction: CommandInteraction): Promise<void>,
 }
 
 export type CommandOption = {
@@ -39,6 +41,84 @@ export interface EmbedPages {
 	previousPage(): MessageEmbed | null;
 	firstPage(): MessageEmbed | null;
 	lastPage(): MessageEmbed | null;
+}
+
+export type WynnRank = "RECRUIT" | "RECRUITER" | "CAPTAIN" | "STRATEGIST" | "CHIEF" | "OWNER";
+
+export type WynnGuildMember = {
+	name: string;
+	uuid: string;
+	rank: WynnRank;
+	contributed: number;
+	joined: string;
+	joinedFriendly: string;
+}
+
+export type WynnGuildObject = {
+	name: string;
+	prefix: string;
+	members: WynnGuildMember[];
+	xp: number;
+	level: number;
+	created: string;
+	createdFriendly: string;
+	territories: number;
+	banner: BannerData | null;
+	request: {timestamp: number, version: number};
+	error?: string;
+}
+
+export type WynnGuildError = {error: string}
+
+export type WynnPlayerObject = {
+	username: string;
+	uuid: string;
+	rank: "Player" | "Builder" | "Administrator";
+	meta: {
+		firstJoin: string;
+		lastJoin: string;
+		location: {
+			online: boolean;
+			server: string | null;
+		};
+		playtime: number;
+		tag: {
+			display: boolean;
+			value: Rank;
+		};
+		veteran: boolean;
+	}
+	guild: {
+		name: string | null;
+		rank: string | null;
+	}
+	global: {
+		chestsFound: number;
+		blocksWalked: number;
+		itemsIdentified: number;
+		mobsKilled: number;
+		totalLevel: {
+			combat: number;
+			profession: number;
+			combined: number;
+		}
+		pvp: {
+			kills: number;
+			deaths: number;
+		}
+		logins: number;
+		deaths: number;
+		discoveries: number;
+		eventsWon: number;
+	}
+}
+
+export type WynnAPIPlayer = {
+	kind: string;
+	code: number;
+	timestamp: number;
+	version: string;
+	data: WynnPlayerObject[];
 }
 
 export type BannerColor = "WHITE" | "LIGHT_GRAY" | "GRAY" | "BLACK" | "YELLOW" | "ORANGE" | "RED" | "BROWN" | "LIME" | "GREEN" | "LIGHT_BLUE" | "CYAN" | "BLUE" | "PINK" | "MAGENTA" | "PURPLE";

@@ -1,4 +1,3 @@
-import { CommandInteraction } from "discord.js";
 import { Command } from "../../types";
 
 export const command: Command = {
@@ -9,7 +8,7 @@ export const command: Command = {
 	cooldown: 0,
 	options: [],
 
-	async execute(interaction: CommandInteraction) {
+	async execute(interaction) {
 		await interaction.followUp((Math.random() >= 0.5) ? "heads" : "tails");
 	},
 };

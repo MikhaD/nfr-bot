@@ -1,7 +1,7 @@
 import { createCanvas, loadImage } from "canvas";
 import { HexColorString } from "discord.js";
 import fetch from "node-fetch";
-import { BannerData, Command, MojangAPIProfileResponse, MojangApiProfileValueObject, Permission, Rank } from "../types";
+import { BannerData, Command, MojangAPIProfileResponse, MojangApiProfileValueObject, Permission, Rank, WynnAPIPlayer } from "../types";
 
 /**
  * Parse a command's arguments into a string
@@ -208,7 +208,7 @@ export async function fetchPlayer(name: string) {
 	const playerData = await fetch(
 		`https://api.wynncraft.com/v2/player/${name}/stats`
 	);
-	return await playerData.json();
+	return await playerData.json() as WynnAPIPlayer;
 };
 
 /**
@@ -216,7 +216,7 @@ export async function fetchPlayer(name: string) {
  * @param string - The string to convert
  * @returns The input string in title case
  */
-export function toTitleCase(string: string) {
+export function toTitleCase(string="") {
 	return string.toLowerCase().split(" ").map((word) => {
 		return word.slice(0, 1).toUpperCase() + word.slice(1);
 	});

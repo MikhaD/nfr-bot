@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { Message } from "discord.js";
 import { Command } from "../../types";
 import Embed from "../../utility/Embed";
 import MessageObject from "../../utility/MessageObject";
@@ -16,7 +16,7 @@ export const command: Command = {
 		required: true
 	}],
 
-	async execute(interaction: CommandInteraction) {
+	async execute(interaction) {
 		const message = new MessageObject("Hello!");
 		let embed = new Embed("test title", "test description", true);
 		let embed2 = new Embed("Number 2", "test description");

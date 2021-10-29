@@ -1,5 +1,3 @@
-import { CommandInteraction } from "discord.js";
-
 import { readdirSync } from "fs";
 import path from "path";
 import { Command } from "../../types";
@@ -29,7 +27,7 @@ export const command: Command = {
 		choices: choices
 	}],
 
-	async execute(interaction: CommandInteraction) {
+	async execute(interaction) {
 		const commandName = interaction.options.getString("command")!;
 		const command = global.commands.get(commandName)!;
 		const commandDir = path.join(__dirname, `../${command.category}/${command.name}`);

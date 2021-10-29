@@ -1,4 +1,3 @@
-import { CommandInteraction } from "discord.js";
 import { Command } from "../../types";
 import { randint } from "../../utility/utility";
 
@@ -14,7 +13,7 @@ export const command: Command = {
 		description: "A list of space seperated options. Strings in inverted commas count as one option",
 		required: true
 	}],
-	async execute(interaction: CommandInteraction) {
+	async execute(interaction) {
 		//info ######## combine groups of args that start and end in inverted commas into single args ########
 		let comma = "";
 		let args: string[] = [];
@@ -45,6 +44,6 @@ export const command: Command = {
 		if (str !== "") args.push(str);
 
 		//info ############################# choose and return a random argument #############################
-		await interaction.followUp(`${args[[randint(args.length)]]}`);
+		await interaction.followUp(`${args[randint(args.length)]}`);
 	},
 };

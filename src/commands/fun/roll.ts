@@ -2,7 +2,6 @@ import { Command } from "../../types";
 
 import { randint } from "../../utility/utility";
 import config from "../../config.json";
-import { CommandInteraction } from "discord.js";
 
 export const command: Command = {
 	name: "roll",
@@ -17,7 +16,7 @@ export const command: Command = {
 		required: false
 	}],
 
-	async execute(interaction: CommandInteraction) {
+	async execute(interaction) {
 		const sides = interaction.options.getInteger("sides") || config.defualt_dice;
 		await interaction.followUp(`${randint(sides) + 1}`);
 	},

@@ -1,8 +1,7 @@
-import { Collection, CommandInteraction, Message } from "discord.js";
+import { Message } from "discord.js";
 import Embed from "../../utility/Embed";
 import MessageObject from "../../utility/MessageObject";
 import { Command } from "../../types";
-import { commands } from "../..";
 
 const pages = [
 	"https://media.discordapp.net/attachments/844148161647476756/901946411325739058/cover.png",
@@ -24,11 +23,10 @@ export const command: Command = {
 	ephemeral: false,
 	perms: [],
 	cooldown: 60,
-	cooldowns: new Collection<string, number>(),
 	server: "739428526431666237",
 	options: [],
 
-	async execute(interaction: CommandInteraction) {
+	async execute(interaction) {
 		const message = new MessageObject();
 		for (let i = 0; i < pages.length; ++i) {
 			const embed = new Embed();

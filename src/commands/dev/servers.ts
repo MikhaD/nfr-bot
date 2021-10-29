@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { Message } from "discord.js";
 import { Command } from "../../types";
 
 import Embed from "../../utility/Embed";
@@ -12,7 +12,7 @@ export const command: Command = {
 	cooldown: 0,
 	options: [],
 
-	async execute(interaction: CommandInteraction) {
+	async execute(interaction) {
 		const embed = new Embed("Bot servers", `This bot is currently in ${interaction.client.guilds.cache.size} server${interaction.client.guilds.cache.size > 1 ? "s" : ""}:`);
 		for (const guild of interaction.client.guilds.cache) {
 			embed.addField(guild[1].name, `ID: ${guild[1].id}`);

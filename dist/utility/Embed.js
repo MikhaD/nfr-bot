@@ -1,8 +1,11 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ErrorEmbed = exports.WarnEmbed = exports.SuccessEmbed = void 0;
 const discord_js_1 = require("discord.js");
-const config = require("../config.json");
+const config_json_1 = __importDefault(require("../config.json"));
 class Embed extends discord_js_1.MessageEmbed {
     index;
     fieldCount;
@@ -13,7 +16,7 @@ class Embed extends discord_js_1.MessageEmbed {
         super();
         this.setTitle(`${title}`);
         this.setDescription(`${description}`);
-        this.setColor(config.colors.embed.default);
+        this.setColor(config_json_1.default.colors.embed.default);
         this.index = 0;
         this.fieldCount = 0;
         this.pages = [this];
@@ -85,21 +88,21 @@ exports.default = Embed;
 class SuccessEmbed extends Embed {
     constructor(title = "", description = "") {
         super(title, description);
-        this.setColor(config.colors.embed.success);
+        this.setColor(config_json_1.default.colors.embed.success);
     }
 }
 exports.SuccessEmbed = SuccessEmbed;
 class WarnEmbed extends Embed {
     constructor(title = "", description = "") {
         super(title, description);
-        this.setColor(config.colors.embed.warn);
+        this.setColor(config_json_1.default.colors.embed.warn);
     }
 }
 exports.WarnEmbed = WarnEmbed;
 class ErrorEmbed extends Embed {
     constructor(title = "", description = "") {
         super(title, description);
-        this.setColor(config.colors.embed.error);
+        this.setColor(config_json_1.default.colors.embed.error);
     }
 }
 exports.ErrorEmbed = ErrorEmbed;
