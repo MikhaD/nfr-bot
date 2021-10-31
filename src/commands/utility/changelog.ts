@@ -1,22 +1,28 @@
-const path = require("path");
-const pkg = require(path.join(__dirname, "../../../package.json"));
-const { readdirSync, readFileSync } = require("fs");
-const { Embed } = require("../../utility/Embed");
+import path from 'path';
+import { readdirSync, readFileSync } from "fs";
+import Embed from "../../utility/Embed.js";
+import { Command } from "../../types";
+
+import { fileURLToPath } from 'url';
+
+const __dirname = fileURLToPath(new URL(".", import.meta.url))
 
 const logsPath = path.join(__dirname, "../../../changelogs");
+const currentVersion = JSON.parse(readFileSync(path.join(__dirname, "../../../package.json")).toString())?.version;
 const versions = readdirSync(logsPath);
 const choices = [];
 
 for (const version of versions.reverse()) {
 	choices.push({
-		name: `${version.slice(0, -4)}`,
-		value: `${version.slice(0, -4)}`
+		name: `${version.slice(0, -3)}`,
+		value: `${version.slice(0, -3)}`
 	});
 }
 
-module.exports = {
+export const command: Command = {
 	name: "changelog",
 	description: "Display the list of changes for a given version, latest by default",
+	ephemeral: false,
 	cooldown: 5,
 	perms: ["MANAGE_GUILD"],
 	options: [{
@@ -32,10 +38,10 @@ module.exports = {
 
 		const changelog = new Embed(
 			`Version ${version} changelog:`,
-			readFileSync(`${logsPath}/${version}.txt`).toString()
+			readFileSync(`${logsPath}/${version}.md`).toString()
 		);
 
-		changelog.setAuthor(`Current version: ${pkg.version}`, interaction.client.user.avatarURL());
+		changelog.setAuthor(`Current version: ${currentVersion}`, interaction.client.user?.avatarURL() || undefined);
 
 		await interaction.followUp({embeds: [changelog]});
 	}

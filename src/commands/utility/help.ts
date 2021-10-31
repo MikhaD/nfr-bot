@@ -1,10 +1,15 @@
-const { Embed } = require("../../utility/Embed");
-const MessageObject = require("../../utility/MessageObject");
-const { parseArguments, parsePermissions } = require("../../utility/utility");
+import { Message } from "discord.js";
+import { Command, customClient } from "../../types";
+import Embed from "../../utility/Embed.js";
+import MessageObject from "../../utility/MessageObject.js";
+import { parseArguments, parsePermissions } from "../../utility/utility.js";
 
-module.exports = {
+export const command: Command = {
 	name: "help",
 	description: "Show the help menu, or help info for a command",
+	ephemeral: false,
+	perms: [],
+	cooldown: 0,
 	options: [{
 		name: "command",
 		type: "STRING",
@@ -13,11 +18,11 @@ module.exports = {
 	}],
 
 	async execute(interaction) {
-		const cmd = interaction.options.getString("command");
-		if (cmd) {
-			const command = interaction.client.commands.get(cmd);
+		const client: customClient = interaction.client;
+		const command = client.commands?.get(interaction.options.getString("command") || "");
+		if (command) {
 			const embed = new Embed(`/${command.name} help`, command.description);
-			//info Syntax
+			// Syntax
 			let syntax = `\`/${command.name}${parseArguments(command)}\`\n`;
 			if (command.options) {
 				for (const option of command.options) {
@@ -28,18 +33,18 @@ module.exports = {
 				}
 			}
 			embed.addField("Syntax", syntax);
-			//info Permissions
-			if (command.perms) embed.addField("Permissions", parsePermissions(command.perms));
-			//info Cooldown
-			if (command.cooldown) embed.addField("Cooldown", `${command.cooldown} seconds`);
-			//info Catgory
+			// Permissions
+			if (command.perms.length > 0) embed.addField("Permissions", parsePermissions(command.perms));
+			// Cooldown
+			if (command.cooldown > 0) embed.addField("Cooldown", `${command.cooldown} seconds`);
+			// Catgory
 			embed.setFooter(`\ncommand category: ${command.category}`);
 
 			await interaction.followUp(embed);
 		} else {
 			const message = new MessageObject();
 			const categories = new Map();
-			for (const cmd of interaction.client.commands) {
+			for (const cmd of client.commands!) {
 				if (cmd[1].category !== "dev") {
 					if (!categories.get(cmd[1].category)) {
 						categories.set(cmd[1].category, new Embed(`${cmd[1].category} commands`));
@@ -50,8 +55,7 @@ module.exports = {
 			for (const embed of categories.values()) {
 				message.addPage(embed);
 			}
-			const msg = await interaction.followUp(message);
-			message.watchMessage(msg);
+			message.watchMessage(await interaction.followUp(message) as Message);
 		}
 	}
 };

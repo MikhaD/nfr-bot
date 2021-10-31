@@ -1,9 +1,12 @@
-const path = require("path");
-const { randint } = require(path.join(__dirname, "../../utility/utility"));
+import { Command } from "../../types";
+import { randint } from "../../utility/utility.js";
 
-module.exports = {
+export const command: Command = {
 	name: "choose",
 	description: "Choose one of the provided options at random",
+	ephemeral: false,
+	perms: [],
+	cooldown: 0,
 	options: [{
 		name: "options",
 		type: "STRING",
@@ -13,9 +16,9 @@ module.exports = {
 	async execute(interaction) {
 		//info ######## combine groups of args that start and end in inverted commas into single args ########
 		let comma = "";
-		let args = [];
+		let args: string[] = [];
 		let str = "";
-		const options = interaction.options.getString("options").replaceAll(/\s+/g, " ");
+		const options = interaction.options.getString("options")!.replaceAll(/\s+/g, " ");
 
 		for (let i = 0; i < options.length; ++i) {
 			if (!comma) {
@@ -41,6 +44,6 @@ module.exports = {
 		if (str !== "") args.push(str);
 
 		//info ############################# choose and return a random argument #############################
-		await interaction.followUp(`${args[[randint(args.length)]]}`);
-	}
+		await interaction.followUp(`${args[randint(args.length)]}`);
+	},
 };

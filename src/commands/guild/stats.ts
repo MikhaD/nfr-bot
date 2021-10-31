@@ -1,13 +1,15 @@
-const path = require("path");
-const { fetchPlayer, toTitleCase, makeDateFriendly, spaceNumber, asHours, asDistance, createRankImage, spaceBetween, fetchPlayerFace, fetchForumData } = require(path.join(__dirname, "../../utility/utility"));
-const config = require(path.join(__dirname, "../../config.json"));
-const { MessageAttachment, MessageEmbed } = require("discord.js");
-const { ErrorEmbed } = require("../../utility/Embed");
+import { HexColorString, MessageAttachment, MessageEmbed } from "discord.js";
+import { fetchPlayer, toTitleCase, makeDateFriendly, spaceNumber, asHours, asDistance, createRankImage, spaceBetween, fetchPlayerFace, fetchForumData } from "../../utility/utility.js";
+import config from "../../config.js";
+import { ErrorEmbed } from "../../utility/Embed.js";
+import { Command } from "../../types";
 
-module.exports = {
+export const command: Command = {
 	name: "stats",
 	description: "Show the statistics of a given player, list by default",
 	cooldown: 5,
+	ephemeral: false,
+	perms: [],
 	options: [{
 		name: "name",
 		type: "STRING",
@@ -21,31 +23,34 @@ module.exports = {
 		required: false
 	}],
 	async execute(interaction) {
-		const name = interaction.options.getString("name");
+		const name = interaction.options.getString("name")!;
 		const formatted = interaction.options.getBoolean("formatted");
 
 		const { code, data } = await fetchPlayer(name);
 		try {
 			const player = data[0];
 
-			const message = {};
+			const message = {
+				embeds: new Array(),
+				files: new Array()
+			};
 			const embed = new MessageEmbed();
-			message.embeds = [embed];
-			embed.setColor((player.rank === "Player") ? config.colors.tag[player.meta.tag.value] : config.colors.rank[player.rank]);
+			message.embeds.push(embed);
+			embed.setColor((player.rank === "Player" ? config.colors.tag[player.meta.tag.value || "null"] : config.colors.rank[player.rank]) as HexColorString);
 
-			let forumData = fetchForumData(player.username);
+			const forumDataPromise = fetchForumData(player.username);
 
 			if (formatted) {
 				embed.setTitle(`Player Stats for ${player.username}`);
 				embed.setURL(`https://wynncraft.com/stats/player/${player.username}`);
-				embed.setDescription((player.guild.name !== null) ? `${toTitleCase(player.guild.rank)} of **${player.guild.name}**` : "*Not part of a guild*");
+				embed.setDescription((player.guild.name !== null) ? `${toTitleCase(player.guild.rank || "")} of **${player.guild.name}**` : "*Not part of a guild*");
 
 				const attachmentName = "rankImage.png";
-				let img = createRankImage(player.uuid, player.meta.tag.value);
+				const imgBuffer = createRankImage(player.uuid, player.meta.tag.value);
 
 				if (player.meta.location.online) {
 					embed.addField("Status:", "🟢 Online", true);
-					embed.addField("Current World:", player.meta.location.server, true);
+					embed.addField("Current World:", player.meta.location.server!, true);
 				} else {
 					embed.addField("Status:", "🔴 Offline", true);
 					embed.addField("Last Seen:", makeDateFriendly(player.meta.lastJoin), true);
@@ -70,26 +75,26 @@ module.exports = {
 				embed.addField("Mobs Killed:", spaceNumber(player.global.mobsKilled), true);
 				embed.addField("Distance Traveled:", asDistance(player.global.blocksWalked), true);
 
-				img = await img;
+				const img = await imgBuffer;
 				if (img !== null) {
 					const attachment = new MessageAttachment(img, attachmentName);
-					message.files = [attachment];
+					message.files.push(attachment);
 					embed.setThumbnail(`attachment://${attachmentName}`);
 				}
 			} else {
 				const attachmentName = "face.png";
-				let img = fetchPlayerFace(player.uuid);
+				const imgBuffer = fetchPlayerFace(player.uuid);
 
 				const width = 35;
 				let str = "```ml\n";
 				str += spaceBetween("Joined:", `${makeDateFriendly(player.meta.firstJoin)}`, width) + "\n";
 				if (player.meta.location.online) {
-					str += spaceBetween("Current World:", player.meta.location.server, width) + "\n";
+					str += spaceBetween("Current World:", player.meta.location.server!, width) + "\n";
 				} else {
 					str += spaceBetween("Last Seen:", `${makeDateFriendly(player.meta.lastJoin)}`, width) + "\n";
 				}
 				str += spaceBetween("Rank:", (player.meta.tag.value !== null) ? player.meta.tag.value : "Player", width) + "\n\n";
-				const guildStatus = (player.guild.name !== null) ? `${toTitleCase(player.guild.rank)} of ${player.guild.name}` : "no guild";
+				const guildStatus = (player.guild.name !== null) ? `${toTitleCase(player.guild.rank || "")} of ${player.guild.name}` : "no guild";
 				str += " ".repeat((width - guildStatus.length) / 2) + guildStatus + " ".repeat((width - guildStatus.length) / 2) + "\n\n";
 				str += " ".repeat((width - 20) / 2) + "---- Statistics ----" + " ".repeat((width - 20) / 2) + "\n\n";
 				str += spaceBetween("Total Level:", spaceNumber(player.global.totalLevel.combined), width) + "\n";
@@ -105,14 +110,14 @@ module.exports = {
 				str += "```";
 				embed.setDescription(str);
 
-				img = await img;
+				const img = await imgBuffer;
 				if (img !== null) {
 					const attachment = new MessageAttachment(img, attachmentName);
 					message.files = [attachment];
 				}
 				embed.setAuthor(`Player Stats for ${player.username}`, `attachment://${attachmentName}`, `https://wynncraft.com/stats/player/${player.username}`);
 			}
-			forumData = await forumData;
+			const forumData = await forumDataPromise;
 			if (forumData !== null) {
 				embed.addField("\u200b", `[Forum page](https://forums.wynncraft.com/members/${forumData.id}) (${forumData.username})`);
 			}

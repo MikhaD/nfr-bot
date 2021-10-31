@@ -1,8 +1,11 @@
-const { SuccessEmbed, WarnEmbed } = require("../../utility/Embed");
+import { TextChannel } from "discord.js";
+import { Command, ServerTextChannel } from "../../types";
+import { SuccessEmbed, WarnEmbed } from "../../utility/Embed.js";
 
-module.exports = {
+export const command: Command = {
 	name: "purge",
 	description: "Delete a given number of messages from this channel",
+	ephemeral: false,
 	cooldown: 5,
 	perms: ["ADMINISTRATOR"],
 	options: [{
@@ -19,8 +22,10 @@ module.exports = {
 	}],
 
 	async execute(interaction) {
+		if (!interaction.channel || !(interaction.channel as TextChannel).name) return;
+		const channel = interaction.channel as ServerTextChannel;
 		const ephemeral = interaction.options.getBoolean("ephemeral");
-		const messages = interaction.options.getInteger("messages") + !ephemeral;
+		const messages = interaction.options.getInteger("messages")! + (ephemeral ? 0 : 1);
 
 		if (messages < 1) return;
 		const hundreds = Math.floor(messages / 100);
@@ -29,23 +34,23 @@ module.exports = {
 		let totalDeleted = 0;
 
 		if (remainder > 0) {
-			const e = await interaction.channel.bulkDelete(remainder, true);
+			const e = await channel.bulkDelete(remainder, true);
 			totalDeleted += e.size;
 		}
 		for (let i = 0; i < hundreds; ++i) {
-			const e = await interaction.channel.bulkDelete(100, true);
+			const e = await channel.bulkDelete(100, true);
 			totalDeleted += e.size;
 		}
 
 		if (totalDeleted === messages) {
 			if (ephemeral) {
 				await interaction.followUp(new SuccessEmbed(
-					`${messages} message${(messages !== 1) ? "s" : ""} deleted from #${interaction.channel.name}`,
+					`${messages} message${(messages !== 1) ? "s" : ""} deleted from #${channel.name}`,
 					""
 				));
 			} else {
 				await interaction.channel.send(new SuccessEmbed(
-					`${messages - 1} message${(messages !== 2) ? "s" : ""} deleted from #${interaction.channel.name}`,
+					`${messages - 1} message${(messages !== 2) ? "s" : ""} deleted from #${channel.name}`,
 					"Use `ephemeral: true` to not show this message"
 				));
 			}

@@ -1,4 +1,4 @@
-{
+export default {
 	"prefix": "\\",
 	"developer_id": "420905576508293132",
 	"default_guild": "Nefarious Ravens",
@@ -22,7 +22,7 @@
 		},
 		"rank": {
 			"Media": "#E94EE9",
-			"Build": "#009B9B",
+			"Builder": "#009B9B",
 			"Administrator": "#9B0000"
 		}
 	}
