@@ -1,6 +1,6 @@
 import { TextChannel } from "discord.js";
 import { Command, ServerTextChannel } from "../../types";
-import { SuccessEmbed, WarnEmbed } from "../../utility/Embed";
+import { SuccessEmbed, WarnEmbed } from "../../utility/Embed.js";
 
 export const command: Command = {
 	name: "purge",

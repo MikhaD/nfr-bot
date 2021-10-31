@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.command = void 0;
-const Embed_1 = require("../../utility/Embed");
-exports.command = {
+import { SuccessEmbed, WarnEmbed } from "../../utility/Embed.js";
+export const command = {
     name: "purge",
     description: "Delete a given number of messages from this channel",
     ephemeral: false,
@@ -41,18 +38,18 @@ exports.command = {
         }
         if (totalDeleted === messages) {
             if (ephemeral) {
-                await interaction.followUp(new Embed_1.SuccessEmbed(`${messages} message${(messages !== 1) ? "s" : ""} deleted from #${channel.name}`, ""));
+                await interaction.followUp(new SuccessEmbed(`${messages} message${(messages !== 1) ? "s" : ""} deleted from #${channel.name}`, ""));
             }
             else {
-                await interaction.channel.send(new Embed_1.SuccessEmbed(`${messages - 1} message${(messages !== 2) ? "s" : ""} deleted from #${channel.name}`, "Use `ephemeral: true` to not show this message"));
+                await interaction.channel.send(new SuccessEmbed(`${messages - 1} message${(messages !== 2) ? "s" : ""} deleted from #${channel.name}`, "Use `ephemeral: true` to not show this message"));
             }
         }
         else if (totalDeleted !== messages) {
             if (ephemeral) {
-                await interaction.followUp(new Embed_1.WarnEmbed(`${totalDeleted} of ${messages} messages deleted`, "Messages over 2 weeks old are unable to be deleted"));
+                await interaction.followUp(new WarnEmbed(`${totalDeleted} of ${messages} messages deleted`, "Messages over 2 weeks old are unable to be deleted"));
             }
             else {
-                await interaction.channel.send(new Embed_1.WarnEmbed(`${totalDeleted - 1} of ${messages - 1} messages deleted`, "Messages over 2 weeks old are unable to be deleted"));
+                await interaction.channel.send(new WarnEmbed(`${totalDeleted - 1} of ${messages - 1} messages deleted`, "Messages over 2 weeks old are unable to be deleted"));
             }
         }
     }

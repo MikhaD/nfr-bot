@@ -1,8 +1,12 @@
 import { readdirSync } from "fs";
 import path from "path";
-import { Command } from "../../types";
-import { SuccessEmbed } from "../../utility/Embed";
-import { global } from "../..";
+import { Command, customClient } from "../../types";
+import { SuccessEmbed } from "../../utility/Embed.js";
+
+import { fileURLToPath } from 'url';
+import { Collection } from "discord.js";
+
+const __dirname = fileURLToPath(new URL(".", import.meta.url))
 
 const choices = [];
 //match dirs that don't start with _
@@ -28,17 +32,20 @@ export const command: Command = {
 	}],
 
 	async execute(interaction) {
+		const client: customClient = interaction.client;
 		const commandName = interaction.options.getString("command")!;
-		const command = global.commands.get(commandName)!;
-		const commandDir = path.join(__dirname, `../${command.category}/${command.name}`);
-		delete require.cache[`${commandDir}.js`];
+		const command = client.commands?.get(commandName);
+		if (!command) return;
+		// the querystring ?update=${Date.now()} at the end is a trick to bust the import cache, any consistantly different query would work
+		const commandDir = path.join(__dirname, `../${command.category}/${command.name}.js?update=${Date.now()}`);
 
-		const newCommand = require(commandDir);
+		const newCommand: Command = (await import(commandDir)).command;
 		newCommand.category = command.category;
-		for (const i of global.appCmdManager.cache) {
+		if (command.cooldown > 0) command.cooldowns = new Collection<string, number>();
+		for (const i of client.appCmdManager!.cache) {
 			if (i[1].name === commandName) {
-				await global.appCmdManager.edit(i[0], newCommand);
-				global.commands.set(command.name, newCommand);
+				await client.appCmdManager?.edit(i[0], newCommand);
+				client.commands?.set(command.name, newCommand);
 				break;
 			}
 		}

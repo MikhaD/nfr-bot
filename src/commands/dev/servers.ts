@@ -1,8 +1,8 @@
 import { Message } from "discord.js";
 import { Command } from "../../types";
 
-import Embed from "../../utility/Embed";
-import MessageObject from "../../utility/MessageObject";
+import Embed from "../../utility/Embed.js";
+import MessageObject from "../../utility/MessageObject.js";
 
 export const command: Command = {
 	name: "servers",

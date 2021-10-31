@@ -1,10 +1,14 @@
-import path from "path";
-const pkg = require("../../../package.json"); 
+import path from 'path';
 import { readdirSync, readFileSync } from "fs";
-import Embed from "../../utility/Embed";
+import Embed from "../../utility/Embed.js";
 import { Command } from "../../types";
 
+import { fileURLToPath } from 'url';
+
+const __dirname = fileURLToPath(new URL(".", import.meta.url))
+
 const logsPath = path.join(__dirname, "../../../changelogs");
+const currentVersion = JSON.parse(readFileSync(path.join(__dirname, "../../../package.json")).toString())?.version;
 const versions = readdirSync(logsPath);
 const choices = [];
 
@@ -34,10 +38,10 @@ export const command: Command = {
 
 		const changelog = new Embed(
 			`Version ${version} changelog:`,
-			readFileSync(`${logsPath}/${version}.txt`).toString()
+			readFileSync(`${logsPath}/${version}.md`).toString()
 		);
 
-		changelog.setAuthor(`Current version: ${pkg.version}`, interaction.client.user?.avatarURL() || undefined);
+		changelog.setAuthor(`Current version: ${currentVersion}`, interaction.client.user?.avatarURL() || undefined);
 
 		await interaction.followUp({embeds: [changelog]});
 	}

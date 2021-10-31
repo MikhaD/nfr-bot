@@ -1,8 +1,8 @@
 import { HexColorString, Message, Util } from "discord.js";
-import Embed, { ErrorEmbed } from "../../utility/Embed";
-import MessageObject from "../../utility/MessageObject";
-import config from "../../config.json";
-import { fetchPlayer, fetchGuild } from "../../utility/utility";
+import Embed, { ErrorEmbed } from "../../utility/Embed.js";
+import MessageObject from "../../utility/MessageObject.js";
+import config from "../../config.js";
+import { fetchPlayer, fetchGuild } from "../../utility/utility.js";
 import { Command, WynnGuildObject, WynnGuildMember, WynnAPIPlayer } from "../../types";
 
 export const command: Command = {

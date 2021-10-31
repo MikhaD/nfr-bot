@@ -1,4 +1,3 @@
-"use strict";
-module.exports = class MojangAPI {
+export default class MojangAPI {
     constructor() { }
-};
+}

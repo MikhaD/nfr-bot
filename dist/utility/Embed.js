@@ -1,12 +1,6 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ErrorEmbed = exports.WarnEmbed = exports.SuccessEmbed = void 0;
-const discord_js_1 = require("discord.js");
-const config_json_1 = __importDefault(require("../config.json"));
-class Embed extends discord_js_1.MessageEmbed {
+import { MessageEmbed } from "discord.js";
+import config from "../config.js";
+export default class Embed extends MessageEmbed {
     index;
     fieldCount;
     pages;
@@ -16,7 +10,7 @@ class Embed extends discord_js_1.MessageEmbed {
         super();
         this.setTitle(`${title}`);
         this.setDescription(`${description}`);
-        this.setColor(config_json_1.default.colors.embed.default);
+        this.setColor(config.colors.embed.default);
         this.index = 0;
         this.fieldCount = 0;
         this.pages = [this];
@@ -27,7 +21,7 @@ class Embed extends discord_js_1.MessageEmbed {
         const maxFields = 25;
         ++this.fieldCount;
         if (this.fieldCount > 1 && this.fieldCount % maxFields === 1) {
-            const emb = new discord_js_1.MessageEmbed();
+            const emb = new MessageEmbed();
             if (this.color)
                 emb.setColor(this.color);
             if (this.thumbnail)
@@ -84,25 +78,21 @@ class Embed extends discord_js_1.MessageEmbed {
         return this.pages.at(-1) || null;
     }
 }
-exports.default = Embed;
-class SuccessEmbed extends Embed {
+export class SuccessEmbed extends Embed {
     constructor(title = "", description = "") {
         super(title, description);
-        this.setColor(config_json_1.default.colors.embed.success);
+        this.setColor(config.colors.embed.success);
     }
 }
-exports.SuccessEmbed = SuccessEmbed;
-class WarnEmbed extends Embed {
+export class WarnEmbed extends Embed {
     constructor(title = "", description = "") {
         super(title, description);
-        this.setColor(config_json_1.default.colors.embed.warn);
+        this.setColor(config.colors.embed.warn);
     }
 }
-exports.WarnEmbed = WarnEmbed;
-class ErrorEmbed extends Embed {
+export class ErrorEmbed extends Embed {
     constructor(title = "", description = "") {
         super(title, description);
-        this.setColor(config_json_1.default.colors.embed.error);
+        this.setColor(config.colors.embed.error);
     }
 }
-exports.ErrorEmbed = ErrorEmbed;

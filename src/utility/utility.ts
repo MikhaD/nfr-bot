@@ -1,4 +1,5 @@
-import { createCanvas, loadImage } from "canvas";
+import canv from "canvas";
+const { createCanvas, loadImage } = canv;
 import { HexColorString } from "discord.js";
 import fetch from "node-fetch";
 import { BannerData, Command, MojangAPIProfileResponse, MojangApiProfileValueObject, Permission, Rank, WynnAPIPlayer } from "../types";
@@ -104,7 +105,7 @@ export async function createBannerImage(data: BannerData | null) {
 	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext("2d");
 
-	ctx.fillStyle = exports.colors[data.base.toLowerCase()].rgb();
+	ctx.fillStyle = colors[data.base.toLowerCase()].rgb();
 	ctx.fillRect(0, 0, width, height);
 
 	try {
@@ -112,12 +113,12 @@ export async function createBannerImage(data: BannerData | null) {
 			const tempCanv = createCanvas(width, height);
 			const tempCtx = tempCanv.getContext("2d");
 			tempCtx.imageSmoothingEnabled = false;
-			const img = await loadImage(`./src/images/banners/patterns/${layer.pattern.toLowerCase()}.png`);
+			const img = await loadImage(`./dist/images/banners/patterns/${layer.pattern.toLowerCase()}.png`);
 			tempCtx.drawImage(img, 0, 0, width, height);
 
 			const imgData = tempCtx.getImageData(0, 0, width, height);
 			for (let i = 0; i < imgData.data.length; i += 4) {
-				imgData.data.set([...exports.colors[layer.colour.toLowerCase()].rgbArray()], i);
+				imgData.data.set([...colors[layer.colour.toLowerCase()].rgbArray()], i);
 			}
 			tempCtx.putImageData(imgData, 0, 0);
 			ctx.drawImage(tempCanv, 0, 0, width, height);
@@ -178,7 +179,7 @@ export async function createRankImage(uuid: string, rank: Rank) {
 
 		ctx.drawImage(await img, 0, 0);
 		if (rank) {
-			ctx.drawImage(await loadImage(`./src/images/ranks/${rank}.png`), 0, size + 10);
+			ctx.drawImage(await loadImage(`./dist/images/ranks/${rank}.png`), 0, size + 10);
 		}
 		return canvas.toBuffer("image/png");
 	} catch (e) {
@@ -266,7 +267,7 @@ export function spaceNumber(num: number) {
 export function asHours(num: number) {
 	const hours = Math.floor(num / 60);
 	const minutes = num - (hours * 60);
-	return `${hours >= 1 ? `${exports.spaceNumber(hours)}h ` : ""}${minutes}m`;
+	return `${hours >= 1 ? `${spaceNumber(hours)}h ` : ""}${minutes}m`;
 };
 
 /**
@@ -277,7 +278,7 @@ export function asDays(num: number) {
 	const days = Math.floor(num / 1440);
 	const hours = Math.floor((num - (days * 1440)) / 60);
 	const minutes = num - (days * 1440 + hours * 60);
-	return `${days >= 1 ? `${exports.spaceNumber(days)}d ` : ""}${hours >= 1 ? `${hours}h ` : ""}${minutes}m`;
+	return `${days >= 1 ? `${spaceNumber(days)}d ` : ""}${hours >= 1 ? `${hours}h ` : ""}${minutes}m`;
 };
 
 /**
@@ -286,7 +287,7 @@ export function asDays(num: number) {
  * @returns A formatted string
  */
 export function asDistance(num: number) {
-	return `${num / 1000 >= 1 ? `${exports.spaceNumber(Math.floor(num / 1000))}km ` : ""}${num % 1000}m`;
+	return `${num / 1000 >= 1 ? `${spaceNumber(Math.floor(num / 1000))}km ` : ""}${num % 1000}m`;
 };
 
 /**

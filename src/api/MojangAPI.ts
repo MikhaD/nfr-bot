@@ -1,3 +1,3 @@
-export = class MojangAPI {
+export default class MojangAPI {
 	constructor() {}
-};
+}

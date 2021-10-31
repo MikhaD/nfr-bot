@@ -1,4 +1,3 @@
-"use strict";
-module.exports = class WynnAPI {
+export default class WynnAPI {
     constructor() { }
-};
+}

@@ -1,9 +1,8 @@
 import { Message } from "discord.js";
-import { Command } from "../../types";
-import Embed from "../../utility/Embed";
-import MessageObject from "../../utility/MessageObject";
-import { parseArguments, parsePermissions } from "../../utility/utility";
-import { global } from "../..";
+import { Command, customClient } from "../../types";
+import Embed from "../../utility/Embed.js";
+import MessageObject from "../../utility/MessageObject.js";
+import { parseArguments, parsePermissions } from "../../utility/utility.js";
 
 export const command: Command = {
 	name: "help",
@@ -19,7 +18,8 @@ export const command: Command = {
 	}],
 
 	async execute(interaction) {
-		const command = global.commands.get(interaction.options.getString("command") || "");
+		const client: customClient = interaction.client;
+		const command = client.commands?.get(interaction.options.getString("command") || "");
 		if (command) {
 			const embed = new Embed(`/${command.name} help`, command.description);
 			// Syntax
@@ -34,9 +34,9 @@ export const command: Command = {
 			}
 			embed.addField("Syntax", syntax);
 			// Permissions
-			if (command.perms) embed.addField("Permissions", parsePermissions(command.perms));
+			if (command.perms.length > 0) embed.addField("Permissions", parsePermissions(command.perms));
 			// Cooldown
-			if (command.cooldown) embed.addField("Cooldown", `${command.cooldown} seconds`);
+			if (command.cooldown > 0) embed.addField("Cooldown", `${command.cooldown} seconds`);
 			// Catgory
 			embed.setFooter(`\ncommand category: ${command.category}`);
 
@@ -44,7 +44,7 @@ export const command: Command = {
 		} else {
 			const message = new MessageObject();
 			const categories = new Map();
-			for (const cmd of global.commands) {
+			for (const cmd of client.commands!) {
 				if (cmd[1].category !== "dev") {
 					if (!categories.get(cmd[1].category)) {
 						categories.set(cmd[1].category, new Embed(`${cmd[1].category} commands`));

@@ -1,5 +1,10 @@
 import Collection from "@discordjs/collection";
-import { CommandInteraction, MessageEmbed, NewsChannel, TextChannel, ThreadChannel } from "discord.js";
+import { ApplicationCommandManager, Client, CommandInteraction, GuildApplicationCommandManager, MessageEmbed, NewsChannel, TextChannel, ThreadChannel } from "discord.js";
+
+export interface customClient extends Client {
+	commands?: Collection<string, Command>,
+	appCmdManager?: ApplicationCommandManager | GuildApplicationCommandManager;
+}
 
 export type ServerTextChannel = TextChannel | NewsChannel | ThreadChannel;
 

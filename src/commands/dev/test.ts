@@ -1,12 +1,12 @@
 import { Message } from "discord.js";
 import { Command } from "../../types";
-import Embed from "../../utility/Embed";
-import MessageObject from "../../utility/MessageObject";
+import Embed from "../../utility/Embed.js";
+import MessageObject from "../../utility/MessageObject.js";
 
 export const command: Command = {
 	name: "test",
 	description: "test editing reply with different embed",
-	ephemeral: true,
+	ephemeral: false,
 	perms: ["ADMINISTRATOR"],
 	cooldown: 0,
 	options: [{

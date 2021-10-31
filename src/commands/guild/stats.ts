@@ -1,7 +1,7 @@
-import { fetchPlayer, toTitleCase, makeDateFriendly, spaceNumber, asHours, asDistance, createRankImage, spaceBetween, fetchPlayerFace, fetchForumData } from "../../utility/utility";
-import config from "../../config.json";
 import { HexColorString, MessageAttachment, MessageEmbed } from "discord.js";
-import { ErrorEmbed } from "../../utility/Embed";
+import { fetchPlayer, toTitleCase, makeDateFriendly, spaceNumber, asHours, asDistance, createRankImage, spaceBetween, fetchPlayerFace, fetchForumData } from "../../utility/utility.js";
+import config from "../../config.js";
+import { ErrorEmbed } from "../../utility/Embed.js";
 import { Command } from "../../types";
 
 export const command: Command = {

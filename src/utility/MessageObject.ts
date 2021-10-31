@@ -1,5 +1,5 @@
 import { MessageButton, MessageActionRow, MessageEmbed, MessageAttachment, Message, MessageEditOptions, MessageOptions } from "discord.js";
-import Embed from "./Embed";
+import Embed from "./Embed.js";
 import { EmbedPages } from "../types";
 
 /**

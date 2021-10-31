@@ -1,42 +1,36 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.global = void 0;
-const fs_1 = require("fs");
-const path_1 = __importDefault(require("path"));
-const discord_js_1 = require("discord.js");
-const { ErrorEmbed } = require(path_1.default.join(__dirname, "./utility/Embed"));
-const config = require(path_1.default.join(__dirname, "./config.json"));
-const { parsePermissions } = require(path_1.default.join(__dirname, "./utility/utility.js"));
-const client = new discord_js_1.Client({
+import { readdirSync } from "fs";
+import { Client, Collection, GuildMember } from "discord.js";
+import { parsePermissions } from "./utility/utility.js";
+import { ErrorEmbed } from "./utility/Embed.js";
+import config from "./config.js";
+import { fileURLToPath } from 'url';
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
+const client = new Client({
     partials: ["MESSAGE", "REACTION", "CHANNEL"],
     intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES", "DIRECT_MESSAGE_REACTIONS"]
 });
-exports.global = {
-    commands: new discord_js_1.Collection(),
-    appCmdManager: client.guilds.cache.get(config.dev_guild_id).commands
-};
+const commands = new Collection();
+client.commands = commands;
 const helpChoices = [];
-for (const dir of (0, fs_1.readdirSync)(`${__dirname}/commands`).filter(dir => /^[^_].*$/.test(dir))) {
-    for (const file of (0, fs_1.readdirSync)(`${__dirname}/commands/${dir}`).filter(file => /^[^_].*\.js$/.test(file))) {
-        const command = require(`./commands/${dir}/${file}`).command;
+for (const dir of readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.test(dir))) {
+    for (const file of readdirSync(`${__dirname}/commands/${dir}`).filter(file => /^[^_].*\.js$/.test(file))) {
+        const command = (await import(`./commands/${dir}/${file}`)).command;
         command.category = dir;
         if (command.cooldown > 0)
-            command.cooldowns = new discord_js_1.Collection();
-        exports.global.commands.set(command.name, command);
+            command.cooldowns = new Collection();
+        commands.set(command.name, command);
         if (command.category !== "dev")
             helpChoices.push({ name: `/${command.name}`, value: command.name });
     }
 }
-const help = exports.global.commands.get("help");
+const help = commands.get("help");
 if (help) {
     help.options[0].choices = helpChoices;
 }
 client.once("ready", async () => {
+    client.appCmdManager = client.guilds.cache.get(config.dev_guild_id).commands;
     client.user?.setActivity("/help", { type: "PLAYING" });
-    await exports.global.appCmdManager.set(Array.from(exports.global.commands, el => el[1]));
+    await client.appCmdManager.set(Array.from(commands, el => el[1]));
     console.log(`${client.user?.tag} has logged in.`);
 });
 client.on("messageCreate", async (msg) => {
@@ -47,8 +41,8 @@ client.on("messageCreate", async (msg) => {
 client.on("interactionCreate", async (interaction) => {
     if (interaction.isCommand()) {
         try {
-            const command = exports.global.commands.get(interaction.commandName);
-            if (command && interaction.member instanceof discord_js_1.GuildMember) {
+            const command = commands.get(interaction.commandName);
+            if (command && interaction.member instanceof GuildMember) {
                 const id = interaction.member.id;
                 if (command.category === "dev" && id !== config.developer_id) {
                     return interaction.reply({ content: `⛔ /${command.name} is a developer command, you may not use it`, ephemeral: true });
@@ -92,5 +86,5 @@ client.on("interactionCreate", async (interaction) => {
         }
     }
 });
-require("dotenv").config();
+(await import("dotenv")).config();
 client.login(process.env["TOKEN"]);

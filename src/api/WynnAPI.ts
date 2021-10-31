@@ -1,3 +1,3 @@
-export = class WynnAPI {
+export default class WynnAPI {
 	constructor() {}
-};
+}

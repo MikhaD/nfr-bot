@@ -1,7 +1,7 @@
 import { Command } from "../../types";
 
-import { randint } from "../../utility/utility";
-import config from "../../config.json";
+import { randint } from "../../utility/utility.js";
+import config from "../../config.js";
 
 export const command: Command = {
 	name: "roll",

@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.command = void 0;
-const utility_1 = require("../../utility/utility");
-exports.command = {
+import { randint } from "../../utility/utility.js";
+export const command = {
     name: "choose",
     description: "Choose one of the provided options at random",
     ephemeral: false,
@@ -45,6 +42,6 @@ exports.command = {
         }
         if (str !== "")
             args.push(str);
-        await interaction.followUp(`${args[(0, utility_1.randint)(args.length)]}`);
+        await interaction.followUp(`${args[randint(args.length)]}`);
     },
 };

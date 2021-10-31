@@ -1,15 +1,11 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.command = void 0;
-const path_1 = __importDefault(require("path"));
-const pkg = require("../../../package.json");
-const fs_1 = require("fs");
-const Embed_1 = __importDefault(require("../../utility/Embed"));
-const logsPath = path_1.default.join(__dirname, "../../../changelogs");
-const versions = (0, fs_1.readdirSync)(logsPath);
+import path from 'path';
+import { readdirSync, readFileSync } from "fs";
+import Embed from "../../utility/Embed.js";
+import { fileURLToPath } from 'url';
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
+const logsPath = path.join(__dirname, "../../../changelogs");
+const currentVersion = JSON.parse(readFileSync(path.join(__dirname, "../../../package.json")).toString())?.version;
+const versions = readdirSync(logsPath);
 const choices = [];
 for (const version of versions.reverse()) {
     choices.push({
@@ -17,7 +13,7 @@ for (const version of versions.reverse()) {
         value: `${version.slice(0, -3)}`
     });
 }
-exports.command = {
+export const command = {
     name: "changelog",
     description: "Display the list of changes for a given version, latest by default",
     ephemeral: false,
@@ -32,8 +28,8 @@ exports.command = {
         }],
     async execute(interaction) {
         const version = interaction.options.getString("version");
-        const changelog = new Embed_1.default(`Version ${version} changelog:`, (0, fs_1.readFileSync)(`${logsPath}/${version}.txt`).toString());
-        changelog.setAuthor(`Current version: ${pkg.version}`, interaction.client.user?.avatarURL() || undefined);
+        const changelog = new Embed(`Version ${version} changelog:`, readFileSync(`${logsPath}/${version}.md`).toString());
+        changelog.setAuthor(`Current version: ${currentVersion}`, interaction.client.user?.avatarURL() || undefined);
         await interaction.followUp({ embeds: [changelog] });
     }
 };

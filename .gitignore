@@ -4,5 +4,4 @@ package-lock.json
 testing.js
 dist/commands/dev/
 *.xlsx
-src js/
 todo.md

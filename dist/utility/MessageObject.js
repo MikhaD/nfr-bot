@@ -1,7 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const discord_js_1 = require("discord.js");
-class MessageObject {
+import { MessageButton, MessageActionRow } from "discord.js";
+export default class MessageObject {
     content;
     pages;
     embeds;
@@ -24,7 +22,7 @@ class MessageObject {
             this.embeds.push(this.pages.firstPage());
         }
         if ((this.pages.length > 1 || page.pages.length > 1) && this.components.length === 0) {
-            this.components = [new discord_js_1.MessageActionRow().addComponents(new PrevButton(), new NextButton)];
+            this.components = [new MessageActionRow().addComponents(new PrevButton(), new NextButton)];
         }
         return this;
     }
@@ -59,9 +57,8 @@ class MessageObject {
         }
     }
 }
-exports.default = MessageObject;
 ;
-class NextButton extends discord_js_1.MessageButton {
+class NextButton extends MessageButton {
     constructor() {
         super();
         this.setCustomId("next");
@@ -69,7 +66,7 @@ class NextButton extends discord_js_1.MessageButton {
         this.setStyle("SECONDARY");
     }
 }
-class PrevButton extends discord_js_1.MessageButton {
+class PrevButton extends MessageButton {
     constructor() {
         super();
         this.setCustomId("previous");

@@ -1,10 +1,13 @@
-import { Command, CommandOptionChoice } from "./types";
+import { Command, CommandOptionChoice, customClient } from "./types";
 import { readdirSync } from "fs";
-import path from "path";
 import { Client, Collection, GuildMember } from "discord.js";
-const { ErrorEmbed } = require(path.join(__dirname, "./utility/Embed"));
-const config = require(path.join(__dirname, "./config.json"));
-const { parsePermissions } = require(path.join(__dirname, "./utility/utility.js"));
+import { parsePermissions } from "./utility/utility.js";
+import { ErrorEmbed } from "./utility/Embed.js";
+import config from "./config.js";
+
+import { fileURLToPath } from 'url';
+
+const __dirname = fileURLToPath(new URL(".", import.meta.url))
 
 //   _____                _         _____ _ _            _   
 //  /  __ \              | |       /  __ \ (_)          | |  
@@ -13,26 +16,14 @@ const { parsePermissions } = require(path.join(__dirname, "./utility/utility.js"
 //  | \__/\ | |  __/ (_| | ||  __/ | \__/\ | |  __/ | | | |_ 
 //   \____/_|  \___|\__,_|\__\___|  \____/_|_|\___|_| |_|\__|
 
-const client = new Client({
+const client: customClient = new Client({
 	partials: ["MESSAGE", "REACTION", "CHANNEL"],
 	intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES", "DIRECT_MESSAGE_REACTIONS"]
 });
 
-//   _____                      _     _____ _       _           _     
-//  |  ___|                    | |   |  __ \ |     | |         | |    
-//  | |____  ___ __   ___  _ __| |_  | |  \/ | ___ | |__   __ _| |___ 
-//  |  __\ \/ / '_ \ / _ \| '__| __| | | __| |/ _ \| '_ \ / _` | / __|
-//  | |___>  <| |_) | (_) | |  | |_  | |_\ \ | (_) | |_) | (_| | \__ \
-//  \____/_/\_\ .__/ \___/|_|   \__|  \____/_|\___/|_.__/ \__,_|_|___/
-//            | |                                                     
-//            |_| 
+const commands = new Collection<string, Command>();
+client.commands = commands;
 
-export const global = {
-	commands: new Collection<string, Command>(),
-	//! Register slash commands globally for release version
-	// appCmdManager: client.application!.commands
-	appCmdManager: client.guilds.cache.get(config.dev_guild_id)!.commands
-}
 //  _                     _   _____                                           _     
 // | |                   | | /  __ \                                         | |    
 // | |     ___   __ _  __| | | /  \/ ___  _ __ ___  _ __ ___   __ _ _ __   __| |___ 
@@ -46,15 +37,15 @@ const helpChoices: CommandOptionChoice[] = [];
 for (const dir of readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.test(dir))) {
 	//match files that end in .js and don't start with _
 	for (const file of readdirSync(`${__dirname}/commands/${dir}`).filter(file => /^[^_].*\.js$/.test(file))) {
-		const command: Command = require(`./commands/${dir}/${file}`).command;
+		const command: Command = (await import(`./commands/${dir}/${file}`)).command;
 		command.category = dir;
 		if (command.cooldown > 0) command.cooldowns = new Collection<string, number>();
-		global.commands.set(command.name, command);
+		commands.set(command.name, command);
 		if (command.category !== "dev") helpChoices.push({name: `/${command.name}`, value: command.name});
 	}
 }
 
-const help = global.commands.get("help");
+const help = commands.get("help");
 if (help) {
 	help.options[0].choices = helpChoices;
 }
@@ -69,8 +60,12 @@ if (help) {
 //            |___/
 
 client.once("ready", async () => {
+	//! Register slash commands globally for release version
+	// client.appCmdManager = client.application!.commands;
+	client.appCmdManager = client.guilds.cache.get(config.dev_guild_id)!.commands;
+
 	client.user?.setActivity("/help", { type: "PLAYING" });
-	await global.appCmdManager.set(Array.from(global.commands, el => el[1]));
+	await client.appCmdManager.set(Array.from(commands, el => el[1]));
 
 	console.log(`${client.user?.tag} has logged in.`);
 });
@@ -100,7 +95,7 @@ client.on("interactionCreate", async interaction => {
 	// Check interaction is from a slash command; buttons and drop downs also create interactions
 	if (interaction.isCommand()) {
 		try {
-			const command = global.commands.get(interaction.commandName);
+			const command = commands.get(interaction.commandName);
 			if (command && interaction.member instanceof GuildMember) {
 				const id = interaction.member.id;
 				// check if user has permission to use that command
@@ -142,7 +137,7 @@ client.on("interactionCreate", async interaction => {
 			}
 		} catch (e) {
 			console.log(e);
-			const err = new ErrorEmbed("Failed to execute command", e);
+			const err = new ErrorEmbed("Failed to execute command", e as string);
 			await interaction.followUp({ embeds: [err], ephemeral: true });
 		}
 	}
@@ -158,6 +153,6 @@ client.on("interactionCreate", async interaction => {
 //                     |___/
 
 // load all env variables in .env file
-require("dotenv").config();
+(await import("dotenv")).config();
 // log in
 client.login(process.env["TOKEN"]);

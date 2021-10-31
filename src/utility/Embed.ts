@@ -1,6 +1,6 @@
 import { HexColorString, MessageEmbed, MessageOptions } from "discord.js";
 import { EmbedPages } from "../types";
-import config from "../config.json";
+import config from "../config.js";
 
 /** A multi page capable message embed with the default color highlight, cabable of being sent without needing to be wrapped in a MessageOptions object */
 export default class Embed extends MessageEmbed implements EmbedPages, MessageOptions {

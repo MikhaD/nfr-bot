@@ -1,5 +1,5 @@
 import { Command } from "../../types";
-import { randint } from "../../utility/utility";
+import { randint } from "../../utility/utility.js";
 
 export const command: Command = {
 	name: "choose",

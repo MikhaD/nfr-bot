@@ -1,7 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.command = void 0;
-exports.command = {
+export const command = {
     name: "flip",
     description: "Flip a 50/50 coin",
     ephemeral: false,
