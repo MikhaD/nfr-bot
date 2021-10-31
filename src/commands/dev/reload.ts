@@ -4,7 +4,6 @@ import { Command, customClient } from "../../types";
 import { SuccessEmbed } from "../../utility/Embed.js";
 
 import { fileURLToPath } from 'url';
-import { Collection } from "discord.js";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url))
 
@@ -41,7 +40,7 @@ export const command: Command = {
 
 		const newCommand: Command = (await import(commandDir)).command;
 		newCommand.category = command.category;
-		if (command.cooldown > 0) command.cooldowns = new Collection<string, number>();
+		if (command.cooldown > 0) command.cooldowns = new Map<string, number>();
 		for (const i of client.appCmdManager!.cache) {
 			if (i[1].name === commandName) {
 				await client.appCmdManager?.edit(i[0], newCommand);

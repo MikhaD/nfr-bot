@@ -1,6 +1,6 @@
 import { Command, CommandOptionChoice, customClient } from "./types";
 import { readdirSync } from "fs";
-import { Client, Collection, GuildMember } from "discord.js";
+import { Client, GuildMember } from "discord.js";
 import { parsePermissions } from "./utility/utility.js";
 import { ErrorEmbed } from "./utility/Embed.js";
 import config from "./config.js";
@@ -21,7 +21,7 @@ const client: customClient = new Client({
 	intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES", "DIRECT_MESSAGE_REACTIONS"]
 });
 
-const commands = new Collection<string, Command>();
+const commands = new Map<string, Command>();
 client.commands = commands;
 
 //  _                     _   _____                                           _     
@@ -39,7 +39,7 @@ for (const dir of readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.
 	for (const file of readdirSync(`${__dirname}/commands/${dir}`).filter(file => /^[^_].*\.js$/.test(file))) {
 		const command: Command = (await import(`./commands/${dir}/${file}`)).command;
 		command.category = dir;
-		if (command.cooldown > 0) command.cooldowns = new Collection<string, number>();
+		if (command.cooldown > 0) command.cooldowns = new Map<string, number>();
 		commands.set(command.name, command);
 		if (command.category !== "dev") helpChoices.push({name: `/${command.name}`, value: command.name});
 	}

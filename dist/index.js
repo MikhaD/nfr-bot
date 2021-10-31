@@ -1,5 +1,5 @@
 import { readdirSync } from "fs";
-import { Client, Collection, GuildMember } from "discord.js";
+import { Client, GuildMember } from "discord.js";
 import { parsePermissions } from "./utility/utility.js";
 import { ErrorEmbed } from "./utility/Embed.js";
 import config from "./config.js";
@@ -9,7 +9,7 @@ const client = new Client({
     partials: ["MESSAGE", "REACTION", "CHANNEL"],
     intents: ["GUILDS", "GUILD_MESSAGES", "GUILD_MESSAGE_REACTIONS", "DIRECT_MESSAGES", "DIRECT_MESSAGE_REACTIONS"]
 });
-const commands = new Collection();
+const commands = new Map();
 client.commands = commands;
 const helpChoices = [];
 for (const dir of readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.test(dir))) {
@@ -17,7 +17,7 @@ for (const dir of readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.
         const command = (await import(`./commands/${dir}/${file}`)).command;
         command.category = dir;
         if (command.cooldown > 0)
-            command.cooldowns = new Collection();
+            command.cooldowns = new Map();
         commands.set(command.name, command);
         if (command.category !== "dev")
             helpChoices.push({ name: `/${command.name}`, value: command.name });

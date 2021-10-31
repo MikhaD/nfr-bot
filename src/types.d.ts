@@ -1,8 +1,7 @@
-import Collection from "@discordjs/collection";
 import { ApplicationCommandManager, Client, CommandInteraction, GuildApplicationCommandManager, MessageEmbed, NewsChannel, TextChannel, ThreadChannel } from "discord.js";
 
 export interface customClient extends Client {
-	commands?: Collection<string, Command>,
+	commands?: Map<string, Command>,
 	appCmdManager?: ApplicationCommandManager | GuildApplicationCommandManager;
 }
 
@@ -14,7 +13,7 @@ export type Command = {
 	ephemeral: boolean,
 	perms: Permission[],
 	cooldown: number,
-	cooldowns?: Collection<string, number>,
+	cooldowns?: Map<string, number>,
 	server?: string,
 	options: CommandOption[],
 	category?: string, 
