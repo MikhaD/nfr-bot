@@ -104,8 +104,8 @@ client.on("interactionCreate", async interaction => {
 					return interaction.reply({ content: `⛔ /${command.name} is a developer command, you may not use it`, ephemeral: true });
 				}
 				if (command.perms) {
-					if (interaction.inGuild()) {
-						const authorPerms = interaction.channel?.permissionsFor(interaction.member);
+					if (interaction.channel && interaction.channel.type !== "DM") {
+						const authorPerms = interaction.channel.permissionsFor(interaction.member);
 						if (!authorPerms || !authorPerms.has(command.perms)) {
 							return interaction.reply({ content: `⛔ ${parsePermissions(command.perms)} is required to use this command`, ephemeral: true });
 						}

@@ -21,7 +21,7 @@ export const command: Command = {
 	}],
 
 	async execute(interaction) {
-		if (!interaction.channel || !interaction.inGuild()) return;
+		if (!interaction.channel || interaction.channel.type === "DM") return;
 		const channel = interaction.channel;
 		const ephemeral = interaction.options.getBoolean("ephemeral");
 		const messages = interaction.options.getInteger("messages")! + (ephemeral ? 0 : 1);
