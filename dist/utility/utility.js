@@ -71,7 +71,7 @@ export async function createBannerImage(data) {
             const tempCanv = createCanvas(width, height);
             const tempCtx = tempCanv.getContext("2d");
             tempCtx.imageSmoothingEnabled = false;
-            const img = await loadImage(`./dist/images/banners/patterns/${layer.pattern.toLowerCase()}.png`);
+            const img = await loadImage(`./images/banners/patterns/${layer.pattern.toLowerCase()}.png`);
             tempCtx.drawImage(img, 0, 0, width, height);
             const imgData = tempCtx.getImageData(0, 0, width, height);
             for (let i = 0; i < imgData.data.length; i += 4) {
@@ -120,7 +120,7 @@ export async function createRankImage(uuid, rank) {
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(await img, 0, 0);
         if (rank) {
-            ctx.drawImage(await loadImage(`./dist/images/ranks/${rank}.png`), 0, size + 10);
+            ctx.drawImage(await loadImage(`./images/ranks/${rank}.png`), 0, size + 10);
         }
         return canvas.toBuffer("image/png");
     }

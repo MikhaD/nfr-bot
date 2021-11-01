@@ -1,5 +1,5 @@
 
-![](https://raw.githubusercontent.com/MikhaD/nfr-bot/main/src/images/nfr-bot.png)
+![](https://raw.githubusercontent.com/MikhaD/nfr-bot/main/images/nfr-bot.png)
 
 <div align="center">
 	<a href="https://discord.gg/55XKx6mPuK">

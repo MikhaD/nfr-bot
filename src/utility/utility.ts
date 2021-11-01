@@ -113,7 +113,7 @@ export async function createBannerImage(data: BannerData | null) {
 			const tempCanv = createCanvas(width, height);
 			const tempCtx = tempCanv.getContext("2d");
 			tempCtx.imageSmoothingEnabled = false;
-			const img = await loadImage(`./dist/images/banners/patterns/${layer.pattern.toLowerCase()}.png`);
+			const img = await loadImage(`./images/banners/patterns/${layer.pattern.toLowerCase()}.png`);
 			tempCtx.drawImage(img, 0, 0, width, height);
 
 			const imgData = tempCtx.getImageData(0, 0, width, height);
@@ -179,7 +179,7 @@ export async function createRankImage(uuid: string, rank: Rank) {
 
 		ctx.drawImage(await img, 0, 0);
 		if (rank) {
-			ctx.drawImage(await loadImage(`./dist/images/ranks/${rank}.png`), 0, size + 10);
+			ctx.drawImage(await loadImage(`./images/ranks/${rank}.png`), 0, size + 10);
 		}
 		return canvas.toBuffer("image/png");
 	} catch (e) {
