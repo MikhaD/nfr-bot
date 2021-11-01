@@ -1,5 +1,4 @@
-import { TextChannel } from "discord.js";
-import { Command, ServerTextChannel } from "../../types";
+import { Command } from "../../types";
 import { SuccessEmbed, WarnEmbed } from "../../utility/Embed.js";
 
 export const command: Command = {
@@ -22,8 +21,8 @@ export const command: Command = {
 	}],
 
 	async execute(interaction) {
-		if (!interaction.channel || !(interaction.channel as TextChannel).name) return;
-		const channel = interaction.channel as ServerTextChannel;
+		if (!interaction.channel || !interaction.inGuild()) return;
+		const channel = interaction.channel;
 		const ephemeral = interaction.options.getBoolean("ephemeral");
 		const messages = interaction.options.getInteger("messages")! + (ephemeral ? 0 : 1);
 

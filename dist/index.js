@@ -28,7 +28,7 @@ if (help) {
     help.options[0].choices = helpChoices;
 }
 client.once("ready", async () => {
-    client.appCmdManager = client.guilds.cache.get(config.dev_guild_id).commands;
+    client.appCmdManager = client.application.commands;
     client.user?.setActivity("/help", { type: "PLAYING" });
     await client.appCmdManager.set(Array.from(commands, el => el[1]));
     console.log(`${client.user?.tag} has logged in.`);

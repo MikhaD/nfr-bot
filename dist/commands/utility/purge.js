@@ -18,7 +18,7 @@ export const command = {
             required: false
         }],
     async execute(interaction) {
-        if (!interaction.channel || !interaction.channel.name)
+        if (!interaction.channel || !interaction.inGuild())
             return;
         const channel = interaction.channel;
         const ephemeral = interaction.options.getBoolean("ephemeral");

@@ -5,8 +5,6 @@ export interface customClient extends Client {
 	appCmdManager?: ApplicationCommandManager | GuildApplicationCommandManager;
 }
 
-export type ServerTextChannel = TextChannel | NewsChannel | ThreadChannel;
-
 export type Command = {
 	name: string,
 	description: string,
