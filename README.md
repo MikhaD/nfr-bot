@@ -1,16 +1,16 @@
 
-![](https://raw.githubusercontent.com/MikhaD/nfr-bot/main/images/nfr-bot.png)
-
 <div align="center">
+	<img src="https://raw.githubusercontent.com/MikhaD/nfr-bot/main/images/nfr-bot.png">
+	<br><br>
 	<a href="https://discord.gg/55XKx6mPuK">
 		<img alt="Discord" src="https://img.shields.io/discord/739428526431666237?label=Nefarious%20Ravens&logo=discord&logoColor=ffffff&color=5865F2">
 	</a>
-	<img alt="version" src="https://img.shields.io/github/package-json/v/MikhaD/nfr-bot/stable?color=992699&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgdmlld0JveD0iMCAwIDYgNiI%2BPHBhdGggZmlsbD0iI2ZmZiIgZD0iTTMsMGwyLDBsMCwxbDEsMGwwLDFsLTIsMGwwLDFsLTEsMGwwLDJsMSwwbDAsMWwtMiwwbDAsLTJsLTEsMGwwLC0xIGwtMSwwbDAsLTFsMiwwbDAsLTFsMSwweiIvPjwvc3ZnPg%3D%3D">
+	<img alt="version" src="https://img.shields.io/github/package-json/v/MikhaD/nfr-bot?color=992699&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMCIgaGVpZ2h0PSIzMCIgdmlld0JveD0iMCAwIDYgNiI%2BPHBhdGggZmlsbD0iI2ZmZiIgZD0iTTMsMGwyLDBsMCwxbDEsMGwwLDFsLTIsMGwwLDFsLTEsMGwwLDJsMSwwbDAsMWwtMiwwbDAsLTJsLTEsMGwwLC0xIGwtMSwwbDAsLTFsMiwwbDAsLTFsMSwweiIvPjwvc3ZnPg%3D%3D">
 </div>
 
 ---
 
-A utility discord bot for displaying information from the Wynncraft API, written in Javascript using [discord.js](https://github.com/discordjs/discord.js)
+A utility discord bot for displaying information from the Wynncraft API, written in TypeScript using [discord.js](https://github.com/discordjs/discord.js)
 
 ## Invite
 
@@ -18,7 +18,7 @@ While originally developed for the guild [Nefarious Ravens](https://forums.wynnc
 
 You can invite it [here]()
 
-scopes are bot and applications.commands
+scopes are bot and applications.commands, permissions are Administrator.
 
 ### Dev
 Files and directories starting with _ are ignored by the command parser. Commands in the dev directory are ignored by the help command.
