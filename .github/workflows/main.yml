@@ -27,6 +27,6 @@ jobs:
         with:
           node-version: 16
       - name: install dependancies
-        run: npm ci
+        run: npm i
       - name: compile
         run: npm run build
