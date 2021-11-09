@@ -61,8 +61,8 @@ if (help) {
 
 client.once("ready", async () => {
 	// ! Register slash commands globally for release version
-	client.appCmdManager = client.application!.commands;
-	// client.appCmdManager = client.guilds.cache.get(config.dev_guild_id)!.commands;
+	// client.appCmdManager = client.application!.commands;
+	client.appCmdManager = client.guilds.cache.get(config.dev_guild_id)!.commands;
 
 	client.user?.setActivity("/help", { type: "PLAYING" });
 	await client.appCmdManager.set(Array.from(commands, el => el[1]));

@@ -19,5 +19,5 @@
 		"resolveJsonModule": true,
 		"forceConsistentCasingInFileNames": true,
 	},
-	"exclude": ["src/commands/dev"]
+	// "exclude": ["src/commands/dev"]
 }
