@@ -21,7 +21,7 @@
   "private": "true",
   "main": "./dist/index.js",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "(test -f .env && tsc -p tsconfig.json --inlineSourceMap) || tsc -p tsconfig.json",
     "start": "node ./dist/index.js"
   },
   "dependencies": {

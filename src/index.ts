@@ -5,9 +5,10 @@ import { parsePermissions } from "./utility/utility.js";
 import { ErrorEmbed } from "./utility/Embed.js";
 import config from "./config.js";
 
-import { fileURLToPath } from 'url';
+// load all env variables in .env file
+(await import("dotenv")).config();
 
-const __dirname = fileURLToPath(new URL(".", import.meta.url))
+const __dirname = (await import("url")).fileURLToPath(new URL(".", import.meta.url));
 
 //   _____                _         _____ _ _            _   
 //  /  __ \              | |       /  __ \ (_)          | |  
@@ -24,9 +25,9 @@ const client: customClient = new Client({
 const commands = new Map<string, Command>();
 client.commands = commands;
 
-//  _                     _   _____                                           _     
-// | |                   | | /  __ \                                         | |    
-// | |     ___   __ _  __| | | /  \/ ___  _ __ ___  _ __ ___   __ _ _ __   __| |___ 
+//  _                     _   _____                                           _
+// | |                   | | /  __ \                                         | |
+// | |     ___   __ _  __| | | /  \/ ___  _ __ ___  _ __ ___   __ _ _ __   __| |___
 // | |    / _ \ / _` |/ _` | | |    / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` / __|
 // | |___| (_) | (_| | (_| | | \__/\ (_) | | | | | | | | | | | (_| | | | | (_| \__ \
 // \_____/\___/ \__,_|\__,_|  \____/\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|___/
@@ -60,9 +61,11 @@ if (help) {
 //            |___/
 
 client.once("ready", async () => {
-	// ! Register slash commands globally for release version
-	// client.appCmdManager = client.application!.commands;
-	client.appCmdManager = client.guilds.cache.get(config.dev_guild_id)!.commands;
+	if (process.env["IS_DEV"] === "true") {
+		client.appCmdManager = client.guilds.cache.get(config.dev_guild_id)!.commands;
+	} else {
+		client.appCmdManager = client.application!.commands;
+	}
 
 	client.user?.setActivity("/help", { type: "PLAYING" });
 	await client.appCmdManager.set(Array.from(commands, el => el[1]));
@@ -152,7 +155,5 @@ client.on("interactionCreate", async interaction => {
 //                      __/ |
 //                     |___/
 
-// load all env variables in .env file
-(await import("dotenv")).config();
 // log in
 client.login(process.env["TOKEN"]);
