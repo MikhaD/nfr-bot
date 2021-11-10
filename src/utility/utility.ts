@@ -144,8 +144,8 @@ export async function fetchPlayerFace(uuid: string) {
 
 		const valueObj = JSON.parse(Buffer.from(obj, "base64").toString("utf-8")) as MojangApiProfileValueObject;
 
-		const imgBuffer = await (await fetch(valueObj.textures.SKIN.url)).buffer();
-		const img = await loadImage(imgBuffer);
+		const imgBuffer = await (await fetch(valueObj.textures.SKIN.url)).arrayBuffer();
+		const img = await loadImage(Buffer.from(imgBuffer));
 
 		const size = 40;
 		const canvas = createCanvas(size, size);
@@ -171,7 +171,13 @@ export async function fetchPlayerFace(uuid: string) {
 export async function createRankImage(uuid: string, rank: Rank) {
 	const size = 240;
 	try {
-		let img = loadImage(await (await fetch(`https://visage.surgeplay.com/bust/${size}/${uuid}.png`)).buffer());
+		let img = loadImage(
+			Buffer.from(
+				await (
+					await fetch(`https://visage.surgeplay.com/bust/${size}/${uuid}.png`)
+					).arrayBuffer()
+				)
+			);
 
 		const canvas = createCanvas(size, size + 78);
 		const ctx = canvas.getContext("2d");

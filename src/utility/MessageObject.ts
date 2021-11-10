@@ -18,7 +18,7 @@ export default class MessageObject implements MessageEditOptions, MessageOptions
 	buttonsTimeout: number;
 	thumbnail?: string;
 	/**
-	 * @param text - The message text, if any. `default: ""`
+	 * @param text - The message text, if any.
 	 */
 	constructor(text?: string) {
 		if (text) this.content = text;
@@ -78,7 +78,11 @@ export default class MessageObject implements MessageEditOptions, MessageOptions
 			});
 
 			collector.on("end", async () => {
-				await message.edit({ components: [] });
+				try {
+					await message.edit({ components: [] });
+				} catch {
+					console.log("message deleted before buttons expired");
+				}
 			});
 		}
 	}
@@ -192,7 +196,7 @@ class EmbedChapter implements EmbedPages {
 
 	/**
 	 * Return the first page and set the index to the last element
-	 * @returns - THe last page of this chapter, taking all hierarchies into account
+	 * @returns - The last page of this chapter, taking all hierarchies into account
 	 */
 	lastPage() {
 		this.index = this.pages.length - 1;
