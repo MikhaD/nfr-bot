@@ -1,7 +1,7 @@
 {
   "name": "nfr-bot",
   "author": "MikhaD",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "A Wynncraft discord bot for use by the Nefarious Ravens guild",
   "type": "module",
   "keywords": [
