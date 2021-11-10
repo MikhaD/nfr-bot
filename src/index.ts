@@ -61,8 +61,8 @@ if (help) {
 
 client.once("ready", async () => {
 	// ! Register slash commands globally for release version
-	client.appCmdManager = client.application!.commands;
-	// client.appCmdManager = client.guilds.cache.get(config.dev_guild_id)!.commands;
+	// client.appCmdManager = client.application!.commands;
+	client.appCmdManager = client.guilds.cache.get(config.dev_guild_id)!.commands;
 
 	client.user?.setActivity("/help", { type: "PLAYING" });
 	await client.appCmdManager.set(Array.from(commands, el => el[1]));
@@ -106,7 +106,7 @@ client.on("interactionCreate", async interaction => {
 				if (command.perms) {
 					if (interaction.channel && interaction.channel.type !== "DM") {
 						const authorPerms = interaction.channel.permissionsFor(interaction.member);
-						if (!authorPerms || !authorPerms.has(command.perms)) {
+						if (!authorPerms.has(command.perms)) {
 							return interaction.reply({ content: `⛔ ${parsePermissions(command.perms)} is required to use this command`, ephemeral: true });
 						}
 					} else {
