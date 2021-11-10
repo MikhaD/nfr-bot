@@ -106,7 +106,7 @@ client.on("interactionCreate", async interaction => {
 				if (command.perms) {
 					if (interaction.channel && interaction.channel.type !== "DM") {
 						const authorPerms = interaction.channel.permissionsFor(interaction.member);
-						if (!authorPerms || !authorPerms.has(command.perms)) {
+						if (!authorPerms.has(command.perms)) {
 							return interaction.reply({ content: `⛔ ${parsePermissions(command.perms)} is required to use this command`, ephemeral: true });
 						}
 					} else {
