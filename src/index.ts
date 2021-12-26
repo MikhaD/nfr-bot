@@ -1,7 +1,7 @@
 import { Command, CommandOptionChoice, customClient } from "./types";
 import { readdirSync } from "fs";
 import { Client, GuildMember } from "discord.js";
-import { parsePermissions } from "./utility/utility.js";
+import { msgFromConsole, parsePermissions } from "./utility/utility.js";
 import { ErrorEmbed } from "./utility/Embed.js";
 import config from "./config.js";
 
@@ -42,7 +42,7 @@ for (const dir of readdirSync(`${__dirname}/commands`).filter(dir => /^[^_].*$/.
 		command.category = dir;
 		if (command.cooldown > 0) command.cooldowns = new Map<string, number>();
 		commands.set(command.name, command);
-		if (command.category !== "dev") helpChoices.push({name: `/${command.name}`, value: command.name});
+		if (command.category !== "dev") helpChoices.push({ name: `/${command.name}`, value: command.name });
 	}
 }
 
@@ -71,6 +71,7 @@ client.once("ready", async () => {
 	await client.appCmdManager.set(Array.from(commands, el => el[1]));
 
 	console.log(`${client.user?.tag} has logged in.`);
+	msgFromConsole(client);
 });
 
 //  _                                   _____                                           _
@@ -84,7 +85,7 @@ client.once("ready", async () => {
 
 client.on("messageCreate", async (msg) => {
 	if (msg.author.bot || !msg.content.startsWith(config.prefix)) return;
-	msg.reply({content: `${config.prefix} commands are depricated, use / instead. Do /help for help`});
+	msg.reply({ content: `${config.prefix} commands are depricated, use / instead. Do /help for help` });
 });
 
 //  _   _                 _ _        _____                                           _     
@@ -124,7 +125,7 @@ client.on("interactionCreate", async interaction => {
 					if (command.cooldowns.has(id)) {
 						const expirationTime = command.cooldowns.get(id)! + cooldown;
 						if (now < expirationTime) {
-							return interaction.reply({ content: `🕙 You can only use this command once every ${command.cooldown} seconds,\nyou have ${Math.round((expirationTime - now)/1000)} seconds until you can use it again`, ephemeral: true });
+							return interaction.reply({ content: `🕙 You can only use this command once every ${command.cooldown} seconds,\nyou have ${Math.round((expirationTime - now) / 1000)} seconds until you can use it again`, ephemeral: true });
 						}
 					}
 					command.cooldowns.set(id, now);

@@ -1,8 +1,9 @@
 import canv from "canvas";
 const { createCanvas, loadImage } = canv;
-import { HexColorString } from "discord.js";
+import { HexColorString, TextChannel } from "discord.js";
 import fetch from "node-fetch";
-import { BannerData, Command, MojangAPIProfileResponse, MojangApiProfileValueObject, Permission, Rank, WynnAPIPlayer } from "../types";
+import { createInterface } from "readline";
+import { BannerData, Command, customClient, MojangAPIProfileResponse, MojangApiProfileValueObject, Permission, Rank, WynnAPIPlayer } from "../types";
 
 /**
  * Parse a command's arguments into a string
@@ -28,7 +29,7 @@ export function parseArguments(command: Command) {
  * @param min - The lower limit (inclusive). `default: 0`
  * @returns A number between min and max
  */
- export function randint(max: number, min=0) {
+export function randint(max: number, min = 0) {
 	return min + Math.floor((max - min) * Math.random());
 }
 
@@ -45,10 +46,10 @@ export function parsePermissions(permsArray: Permission[]) {
  * A class representing a color constructed from a hexadecimal string
  */
 export class Color {
-	r: number;	
+	r: number;
 	g: number;
 	b: number;
-	a: number;	
+	a: number;
 	/**
 	 * @param hexString A hexadecimal string representing a color
 	 */
@@ -74,7 +75,7 @@ export class Color {
 }
 
 /**  An array of all the minecraft banner colors as `Color` objects */
-export const colors: {[key: string]: Color} = {
+export const colors: { [key: string]: Color; } = {
 	white: new Color("#F9FFFE"),
 	light_gray: new Color("#9D9D97"),
 	gray: new Color("#474F52"),
@@ -175,9 +176,9 @@ export async function createRankImage(uuid: string, rank: Rank) {
 			Buffer.from(
 				await (
 					await fetch(`https://visage.surgeplay.com/bust/${size}/${uuid}.png`)
-					).arrayBuffer()
-				)
-			);
+				).arrayBuffer()
+			)
+		);
 
 		const canvas = createCanvas(size, size + 78);
 		const ctx = canvas.getContext("2d");
@@ -223,7 +224,7 @@ export async function fetchPlayer(name: string) {
  * @param string - The string to convert
  * @returns The input string in title case
  */
-export function toTitleCase(string="") {
+export function toTitleCase(string = "") {
 	return string.toLowerCase().split(" ").map((word) => {
 		return word.slice(0, 1).toUpperCase() + word.slice(1);
 	});
@@ -303,9 +304,9 @@ export function asDistance(num: number) {
  */
 export async function getUuid(name: string) {
 	try {
-	const response = await fetch(`https://api.mojang.com/users/profiles/minecraft/${name}`);
-	const obj = await response.json() as {name: string, id: string};
-	return obj.id;
+		const response = await fetch(`https://api.mojang.com/users/profiles/minecraft/${name}`);
+		const obj = await response.json() as { name: string, id: string; };
+		return obj.id;
 	} catch (e) {
 		console.log(e);
 		return null;
@@ -331,8 +332,36 @@ export function spaceBetween(str1: string, str2: string, totalSpace: number) {
  */
 export async function fetchForumData(name: string) {
 	const forumData = await (await fetch(`https://api.wynncraft.com/forums/getForumId/${name}`)).json() as
-	{username: string, ign: string, id: number};
+		{ username: string, ign: string, id: number; };
 	if (forumData.id) {
 		return { id: forumData.id, username: forumData.username };
 	} else return null;
 };
+
+/**
+ * Allow someone with console access to the bot to input a channel id and a message to send to that channel as
+ * the bot.
+ * @param client The bot client
+ */
+export async function msgFromConsole(client: customClient) {
+	let channelCache = "";
+	const readline = createInterface({
+		input: process.stdin,
+		output: process.stdout
+	});
+	readline.question("Channel: ", input => {
+		if (input === "" && channelCache !== "") {
+			input = channelCache;
+		}
+		let channel = client.channels.cache.get(input);
+		if (channel) {
+			channelCache = input;
+			readline.question("Message: ", async input => {
+				await (channel as TextChannel).send(input);
+				msgFromConsole(client);
+			});
+		} else {
+			msgFromConsole(client);
+		}
+	});
+}

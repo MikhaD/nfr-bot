@@ -29,7 +29,7 @@ export const command: Command = {
 					// description, required, options
 					syntax += `\`${option.name}\`: ${option.description}
 					required: ${option.required}
-					${(option.choices ? "choices: " + option.choices.reduce((str, c) => `${str}, ${c.name}`, "\b").slice(2) + "\n": "")}`;
+					${(option.choices ? "choices: " + option.choices.reduce((str, c) => `${str}, ${c.name}`, "\b").slice(2) + "\n" : "")}`;
 				}
 			}
 			embed.addField("Syntax", syntax);

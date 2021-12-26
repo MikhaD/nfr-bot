@@ -103,7 +103,7 @@ async function getAbsenteeData(members: WynnGuildMember[]) {
 
 	const result = { absences: new Map<string, number>(), failed: new Array<string>() };
 	for (const player of await Promise.allSettled(promiseArray)) {
-		if (fulfilled(player)) {			
+		if (fulfilled(player)) {
 			try {
 				result.absences.set(player.value.data[0].username, daysSince(player.value.data[0].meta.lastJoin));
 			} catch {

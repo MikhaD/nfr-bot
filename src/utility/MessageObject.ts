@@ -176,7 +176,7 @@ class EmbedChapter implements EmbedPages {
 	previousPage() {
 		const page = this.pages[this.index].previousPage();
 		if (page === null) {
-			if ( this.level !== 0 && this.index === 0) {
+			if (this.level !== 0 && this.index === 0) {
 				return null;
 			}
 			this.index = (this.index + this.pages.length - 1) % this.pages.length;
