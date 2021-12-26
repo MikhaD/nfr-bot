@@ -5,14 +5,14 @@ import { SuccessEmbed } from "../../utility/Embed.js";
 
 import { fileURLToPath } from 'url';
 
-const __dirname = fileURLToPath(new URL(".", import.meta.url))
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
 const choices = [];
 //match dirs that don't start with _
 for (const dir of readdirSync(path.join(__dirname, "../")).filter(dir => /^[^_].*$/.test(dir))) {
 	//match files that end in .js and don't start with _
 	for (const file of readdirSync(path.join(__dirname, `../${dir}`)).filter(file => /^[^_].*\.js$/.test(file))) {
-		choices.push({name: `/${file.slice(0, -3)}`, value: file.slice(0, -3)});
+		choices.push({ name: `/${file.slice(0, -3)}`, value: file.slice(0, -3) });
 	}
 }
 

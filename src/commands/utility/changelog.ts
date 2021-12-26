@@ -5,7 +5,7 @@ import { Command } from "../../types";
 
 import { fileURLToPath } from 'url';
 
-const __dirname = fileURLToPath(new URL(".", import.meta.url))
+const __dirname = fileURLToPath(new URL(".", import.meta.url));
 
 const logsPath = path.join(__dirname, "../../../changelogs");
 const currentVersion = JSON.parse(readFileSync(path.join(__dirname, "../../../package.json")).toString())?.version;
@@ -43,6 +43,6 @@ export const command: Command = {
 
 		changelog.setAuthor(`Current version: ${currentVersion}`, interaction.client.user?.avatarURL() || undefined);
 
-		await interaction.followUp({embeds: [changelog]});
+		await interaction.followUp({ embeds: [changelog] });
 	}
 };

@@ -14,7 +14,7 @@ export default class Embed extends MessageEmbed implements EmbedPages, MessageOp
 	 * @param description - The embed description. `default: ""`
 	 * @param pageNumbersOn - Whether or not to enable page numbers. `default: false`
 	 */
-	constructor(title="", description="", pageNumbersOn=false) {
+	constructor(title = "", description = "", pageNumbersOn = false) {
 		super();
 		this.setTitle(`${title}`);
 		this.setDescription(`${description}`);
@@ -34,7 +34,7 @@ export default class Embed extends MessageEmbed implements EmbedPages, MessageOp
 	 * @param inline - If this field will be displayed inline. `default: false`
 	 * @returns this
 	 */
-	override addField(title="\u200b", text="\u200b", inline=false): this {
+	override addField(title = "\u200b", text = "\u200b", inline = false): this {
 		const maxFields = 25;
 		++this.fieldCount;
 		if (this.fieldCount > 1 && this.fieldCount % maxFields === 1) {
@@ -75,7 +75,7 @@ export default class Embed extends MessageEmbed implements EmbedPages, MessageOp
 		this.pageNumbersOn = pageNumbersOn;
 		if (this.pages.length > 1) {
 			for (let i = 0; i < this.pages.length; ++i) {
-				this.pages[i].setFooter(pageNumbersOn ? `${i+1} of ${this.pages.length}`: "");
+				this.pages[i].setFooter(pageNumbersOn ? `${i + 1} of ${this.pages.length}` : "");
 			}
 		}
 		return this;
@@ -130,7 +130,7 @@ export class SuccessEmbed extends Embed {
 	 * @param title - The success message title. `default: ""`
 	 * @param description - The success message description. `default: ""`
 	 */
-	constructor(title="", description="") {
+	constructor(title = "", description = "") {
 		super(title, description);
 
 		this.setColor(config.colors.embed.success as HexColorString);
@@ -143,7 +143,7 @@ export class WarnEmbed extends Embed {
 	 * @param title - The warning message title. `default: ""`
 	 * @param description - The warning message description. `default: ""`
 	 */
-	constructor(title="", description="") {
+	constructor(title = "", description = "") {
 		super(title, description);
 
 		this.setColor(config.colors.embed.warn as HexColorString);
@@ -156,7 +156,7 @@ export class ErrorEmbed extends Embed {
 	 * @param title - The error message title. `default: ""`
 	 * @param description - The error message description. `default: ""`
 	 */
-	constructor(title="", description="") {
+	constructor(title = "", description = "") {
 		super(title, description);
 
 		this.setColor(config.colors.embed.error as HexColorString);
