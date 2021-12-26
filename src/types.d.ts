@@ -1,11 +1,11 @@
-import { ApplicationCommandManager, BaseApplicationCommandData, Client, CommandInteraction, GuildApplicationCommandManager, MessageEmbed } from "discord.js";
+import { ApplicationCommandDataResolvable, ApplicationCommandManager, BaseApplicationCommandData, Client, CommandInteraction, GuildApplicationCommandManager, MessageEmbed } from "discord.js";
 
 export interface customClient extends Client {
 	commands?: Map<string, Command>,
 	appCmdManager?: ApplicationCommandManager | GuildApplicationCommandManager;
 }
 
-export interface Command extends BaseApplicationCommandData {
+export type Command = ApplicationCommandDataResolvable & {
 	name: string,
 	description: string,
 	ephemeral: boolean,
@@ -16,7 +16,7 @@ export interface Command extends BaseApplicationCommandData {
 	options: CommandOption[],
 	category?: string,
 	execute(interaction: CommandInteraction): Promise<void>,
-}
+};
 
 export type CommandOption = {
 	name: string,
